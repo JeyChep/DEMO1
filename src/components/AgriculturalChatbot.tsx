@@ -263,15 +263,15 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
     
     const aez = determineAEZ(location, aezData);
     
-    let response = `🌱 **${cropType} Crops for ${location.ward} Ward**\n\n`;
+    let response = `🌱 <span style="color: #16a34a; font-weight: bold;">${cropType} Crops for ${location.ward} Ward</span>\n\n`;
     
     // Location info
-    response += `📍 **Location:** ${location.ward}, ${location.subcounty}, ${location.county}\n`;
-    response += `🌡️ **Climate:** ${location.annual_Temp}°C, ${location.annual_Rain}mm rain\n`;
-    response += `⛰️ **Altitude:** ${location.altitude}m, Zone: ${aez.toUpperCase()}\n\n`;
+    response += `📍 <span style="color: #16a34a; font-weight: bold;">Location:</span> ${location.ward}, ${location.subcounty}, ${location.county}\n`;
+    response += `🌡️ <span style="color: #16a34a; font-weight: bold;">Climate:</span> ${location.annual_Temp}°C, ${location.annual_Rain}mm rain\n`;
+    response += `⛰️ <span style="color: #16a34a; font-weight: bold;">Altitude:</span> ${location.altitude}m, Zone: ${aez.toUpperCase()}\n\n`;
     
     if (finalRecs.length > 0) {
-      response += `🏆 **Best ${cropType} Options:**\n\n`;
+      response += `🏆 <span style="color: #16a34a; font-weight: bold;">Best ${cropType} Options:</span>\n\n`;
       
       // Group by crop name for better structure
       const cropGroups = finalRecs.reduce((acc, rec) => {
@@ -283,41 +283,38 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
       
       // Show all crop types in this category
       Object.entries(cropGroups).forEach(([cropName, varieties]) => {
-        response += `**${cropName}**\n`;
+        response += `<span style="color: #16a34a; font-weight: bold;">${cropName}</span>\n`;
         varieties.forEach(rec => {
-          response += `  • ${rec.crop.Variety} (${rec.suitabilityScore}% suitable)\n`;
-          if (rec.matchingFactors.length > 0) {
-            response += `    ✓ ${rec.matchingFactors[0]}\n`;
-          }
+          response += `  • ${rec.crop.Variety}\n`;
         });
         response += `\n`;
       });
       
       // Success tips
-      response += `💡 **${cropType} Success Tips for ${location.ward}:**\n`;
+      response += `💡 <span style="color: #16a34a; font-weight: bold;">${cropType} Success Tips for ${location.ward}:</span>\n`;
       const bestCrop = finalRecs[0];
-      response += `• **Top choice:** ${bestCrop.crop.Crop} - ${bestCrop.crop.Variety}\n`;
+      response += `• <span style="color: #16a34a; font-weight: bold;">Top choice:</span> ${bestCrop.crop.Crop} - ${bestCrop.crop.Variety}\n`;
       
       if (cropType === 'Cereal') {
-        response += `• **Strategy:** Focus on staple food production\n`;
-        response += `• **Market:** Good local demand for cereals\n`;
+        response += `• <span style="color: #16a34a; font-weight: bold;">Strategy:</span> Focus on staple food production\n`;
+        response += `• <span style="color: #16a34a; font-weight: bold;">Market:</span> Good local demand for cereals\n`;
       } else if (cropType === 'Vegetable') {
-        response += `• **Strategy:** High-value crops for quick returns\n`;
-        response += `• **Market:** Target urban markets for better prices\n`;
+        response += `• <span style="color: #16a34a; font-weight: bold;">Strategy:</span> High-value crops for quick returns\n`;
+        response += `• <span style="color: #16a34a; font-weight: bold;">Market:</span> Target urban markets for better prices\n`;
       } else if (cropType === 'Fruit') {
-        response += `• **Strategy:** Long-term investment with high returns\n`;
-        response += `• **Market:** Consider value addition (processing)\n`;
+        response += `• <span style="color: #16a34a; font-weight: bold;">Strategy:</span> Long-term investment with high returns\n`;
+        response += `• <span style="color: #16a34a; font-weight: bold;">Market:</span> Consider value addition (processing)\n`;
       } else if (cropType === 'Legume') {
-        response += `• **Strategy:** Improve soil fertility naturally\n`;
-        response += `• **Market:** Good protein source, high demand\n`;
+        response += `• <span style="color: #16a34a; font-weight: bold;">Strategy:</span> Improve soil fertility naturally\n`;
+        response += `• <span style="color: #16a34a; font-weight: bold;">Market:</span> Good protein source, high demand\n`;
       }
       
       response += `• Visit local agro-dealer for quality seeds\n`;
       response += `• Contact extension officer for guidance\n`;
       
     } else {
-      response += `❌ **Limited ${cropType} options for ${location.ward}**\n\n`;
-      response += `**Suggestions:**\n`;
+      response += `❌ <span style="color: #16a34a; font-weight: bold;">Limited ${cropType} options for ${location.ward}</span>\n\n`;
+      response += `<span style="color: #16a34a; font-weight: bold;">Suggestions:</span>\n`;
       response += `• Try other crop types better suited to your area\n`;
       response += `• Improve soil conditions with organic matter\n`;
       response += `• Contact KALRO ${location.county} office for alternatives\n`;
@@ -344,12 +341,12 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
     const recommendations = getLivestockRecommendations(filteredLivestock, location, aezData);
     const aez = determineAEZ(location, aezData);
     
-    let response = `🐄 **${livestockType} for ${location.ward} Ward**\n\n`;
-    response += `📍 **Location:** ${location.ward}, ${location.subcounty}, ${location.county}\n`;
-    response += `🏔️ **Zone:** ${aez.toUpperCase()}\n\n`;
+    let response = `🐄 <span style="color: #16a34a; font-weight: bold;">${livestockType} for ${location.ward} Ward</span>\n\n`;
+    response += `📍 <span style="color: #16a34a; font-weight: bold;">Location:</span> ${location.ward}, ${location.subcounty}, ${location.county}\n`;
+    response += `🏔️ <span style="color: #16a34a; font-weight: bold;">Zone:</span> ${aez.toUpperCase()}\n\n`;
     
     if (recommendations.length > 0) {
-      response += `🏆 **Perfect ${livestockType} for ${location.ward}:**\n\n`;
+      response += `🏆 <span style="color: #16a34a; font-weight: bold;">Perfect ${livestockType} for ${location.ward}:</span>\n\n`;
       
       const grouped = recommendations.reduce((acc, rec) => {
         if (!acc[rec.livestock.Livestock]) acc[rec.livestock.Livestock] = [];
@@ -358,35 +355,35 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
       }, {} as Record<string, typeof recommendations>);
       
       Object.entries(grouped).forEach(([type, animals]) => {
-        response += `**${type}**\n`;
+        response += `<span style="color: #16a34a; font-weight: bold;">${type}</span>\n`;
         animals.forEach(rec => {
           response += `  • ${rec.livestock.Breed}\n`;
         });
         response += `\n`;
       });
       
-      response += `💡 **${livestockType} Care Tips for ${location.ward}:**\n`;
+      response += `💡 <span style="color: #16a34a; font-weight: bold;">${livestockType} Care Tips for ${location.ward}:</span>\n`;
       
       if (livestockType.includes('Dairy')) {
-        response += `• **Focus:** High milk production breeds\n`;
-        response += `• **Feed:** Quality pasture and concentrates essential\n`;
-        response += `• **Market:** Establish milk collection routes\n`;
+        response += `• <span style="color: #16a34a; font-weight: bold;">Focus:</span> High milk production breeds\n`;
+        response += `• <span style="color: #16a34a; font-weight: bold;">Feed:</span> Quality pasture and concentrates essential\n`;
+        response += `• <span style="color: #16a34a; font-weight: bold;">Market:</span> Establish milk collection routes\n`;
       } else if (livestockType.includes('Poultry')) {
-        response += `• **Housing:** Good ventilation and biosecurity\n`;
-        response += `• **Feed:** Balanced commercial feeds recommended\n`;
-        response += `• **Market:** Both eggs and meat have good demand\n`;
+        response += `• <span style="color: #16a34a; font-weight: bold;">Housing:</span> Good ventilation and biosecurity\n`;
+        response += `• <span style="color: #16a34a; font-weight: bold;">Feed:</span> Balanced commercial feeds recommended\n`;
+        response += `• <span style="color: #16a34a; font-weight: bold;">Market:</span> Both eggs and meat have good demand\n`;
       } else if (livestockType.includes('goat')) {
-        response += `• **Advantage:** Low maintenance, drought tolerant\n`;
-        response += `• **Feed:** Browse and crop residues sufficient\n`;
-        response += `• **Market:** Good demand for meat and milk\n`;
+        response += `• <span style="color: #16a34a; font-weight: bold;">Advantage:</span> Low maintenance, drought tolerant\n`;
+        response += `• <span style="color: #16a34a; font-weight: bold;">Feed:</span> Browse and crop residues sufficient\n`;
+        response += `• <span style="color: #16a34a; font-weight: bold;">Market:</span> Good demand for meat and milk\n`;
       }
       
       response += `• Contact local veterinary officer\n`;
       response += `• Join ${livestockType.toLowerCase()} farmer groups\n`;
       
     } else {
-      response += `❌ **No specific ${livestockType} matches for ${location.ward}**\n\n`;
-      response += `**What to do:**\n`;
+      response += `❌ <span style="color: #16a34a; font-weight: bold;">No specific ${livestockType} matches for ${location.ward}</span>\n\n`;
+      response += `<span style="color: #16a34a; font-weight: bold;">What to do:</span>\n`;
       response += `• Contact ${location.county} veterinary office\n`;
       response += `• Consider other livestock types suitable for your area\n`;
       response += `• Visit KALRO regional centers for guidance\n`;
@@ -412,12 +409,12 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
     const recommendations = getPastureRecommendations(filteredPasture, location, aezData);
     const aez = determineAEZ(location, aezData);
     
-    let response = `🌾 **${pastureType} for ${location.ward} Ward**\n\n`;
-    response += `📍 **Location:** ${location.ward}, ${location.subcounty}, ${location.county}\n`;
-    response += `🏔️ **Zone:** ${aez.toUpperCase()}\n\n`;
+    let response = `🌾 <span style="color: #16a34a; font-weight: bold;">${pastureType} for ${location.ward} Ward</span>\n\n`;
+    response += `📍 <span style="color: #16a34a; font-weight: bold;">Location:</span> ${location.ward}, ${location.subcounty}, ${location.county}\n`;
+    response += `🏔️ <span style="color: #16a34a; font-weight: bold;">Zone:</span> ${aez.toUpperCase()}\n\n`;
     
     if (recommendations.length > 0) {
-      response += `🏆 **Perfect ${pastureType} for ${location.ward}:**\n\n`;
+      response += `🏆 <span style="color: #16a34a; font-weight: bold;">Perfect ${pastureType} for ${location.ward}:</span>\n\n`;
       
       const grouped = recommendations.reduce((acc, rec) => {
         if (!acc[rec.pasture['Pasture/fodder']]) acc[rec.pasture['Pasture/fodder']] = [];
@@ -426,35 +423,35 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
       }, {} as Record<string, typeof recommendations>);
       
       Object.entries(grouped).forEach(([type, pastures]) => {
-        response += `**${type}**\n`;
+        response += `<span style="color: #16a34a; font-weight: bold;">${type}</span>\n`;
         pastures.forEach(rec => {
-          response += `  • ${rec.pasture.Variety} (${rec.pasture.Type})\n`;
+          response += `  • ${rec.pasture.Variety}\n`;
         });
         response += `\n`;
       });
       
-      response += `🌱 **${pastureType} Growing Tips for ${location.ward}:**\n`;
+      response += `🌱 <span style="color: #16a34a; font-weight: bold;">${pastureType} Growing Tips for ${location.ward}:</span>\n`;
       
       if (pastureType === 'Pasture') {
-        response += `• **Establishment:** Prepare land well before planting\n`;
-        response += `• **Management:** Rotational grazing recommended\n`;
+        response += `• <span style="color: #16a34a; font-weight: bold;">Establishment:</span> Prepare land well before planting\n`;
+        response += `• <span style="color: #16a34a; font-weight: bold;">Management:</span> Rotational grazing recommended\n`;
       } else if (pastureType === 'Legume') {
-        response += `• **Benefit:** Fixes nitrogen, improves soil fertility\n`;
-        response += `• **Management:** Can be mixed with grasses\n`;
+        response += `• <span style="color: #16a34a; font-weight: bold;">Benefit:</span> Fixes nitrogen, improves soil fertility\n`;
+        response += `• <span style="color: #16a34a; font-weight: bold;">Management:</span> Can be mixed with grasses\n`;
       } else if (pastureType === 'Fodder') {
-        response += `• **System:** Cut-and-carry feeding system\n`;
-        response += `• **Yield:** High biomass production per unit area\n`;
+        response += `• <span style="color: #16a34a; font-weight: bold;">System:</span> Cut-and-carry feeding system\n`;
+        response += `• <span style="color: #16a34a; font-weight: bold;">Yield:</span> High biomass production per unit area\n`;
       } else if (pastureType === 'Tree\\shrub') {
-        response += `• **Benefit:** Provides shade and soil conservation\n`;
-        response += `• **Management:** Prune regularly for optimal production\n`;
+        response += `• <span style="color: #16a34a; font-weight: bold;">Benefit:</span> Provides shade and soil conservation\n`;
+        response += `• <span style="color: #16a34a; font-weight: bold;">Management:</span> Prune regularly for optimal production\n`;
       }
       
       response += `• Get quality seeds from certified dealers\n`;
       response += `• Contact extension officer for guidance\n`;
       
     } else {
-      response += `❌ **No specific ${pastureType} matches for ${location.ward}**\n\n`;
-      response += `**Try these options:**\n`;
+      response += `❌ <span style="color: #16a34a; font-weight: bold;">No specific ${pastureType} matches for ${location.ward}</span>\n\n`;
+      response += `<span style="color: #16a34a; font-weight: bold;">Try these options:</span>\n`;
       response += `• Contact ${location.county} agricultural office\n`;
       response += `• Consider other pasture types suitable for your area\n`;
       response += `• Visit KALRO research stations\n`;
@@ -478,15 +475,15 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
     
     const aez = determineAEZ(location, aezData);
     
-    let response = `🌱 **Best Crops for ${location.ward} Ward**\n\n`;
+    let response = `🌱 <span style="color: #16a34a; font-weight: bold;">Best Crops for ${location.ward} Ward</span>\n\n`;
     
     // Location info
-    response += `📍 **Location:** ${location.ward}, ${location.subcounty}, ${location.county}\n`;
-    response += `🌡️ **Climate:** ${location.annual_Temp}°C, ${location.annual_Rain}mm rain\n`;
-    response += `⛰️ **Altitude:** ${location.altitude}m, Zone: ${aez.toUpperCase()}\n\n`;
+    response += `📍 <span style="color: #16a34a; font-weight: bold;">Location:</span> ${location.ward}, ${location.subcounty}, ${location.county}\n`;
+    response += `🌡️ <span style="color: #16a34a; font-weight: bold;">Climate:</span> ${location.annual_Temp}°C, ${location.annual_Rain}mm rain\n`;
+    response += `⛰️ <span style="color: #16a34a; font-weight: bold;">Altitude:</span> ${location.altitude}m, Zone: ${aez.toUpperCase()}\n\n`;
     
     if (finalRecs.length > 0) {
-      response += `🏆 **Top Recommended Crops:**\n\n`;
+      response += `🏆 <span style="color: #16a34a; font-weight: bold;">Top Recommended Crops:</span>\n\n`;
       
       // Group by crop name for better structure
       const cropGroups = finalRecs.reduce((acc, rec) => {
@@ -498,33 +495,30 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
       
       // Show top 5 crop types
       Object.entries(cropGroups).slice(0, 5).forEach(([cropName, varieties]) => {
-        response += `**${cropName}**\n`;
+        response += `<span style="color: #16a34a; font-weight: bold;">${cropName}</span>\n`;
         varieties.slice(0, 3).forEach(rec => {
-          response += `  • ${rec.crop.Variety} (${rec.suitabilityScore}% suitable)\n`;
-          if (rec.matchingFactors.length > 0) {
-            response += `    ✓ ${rec.matchingFactors[0]}\n`;
-          }
+          response += `  • ${rec.crop.Variety}\n`;
         });
         response += `\n`;
       });
       
       // Success tips
-      response += `💡 **Success Tips for ${location.ward}:**\n`;
+      response += `💡 <span style="color: #16a34a; font-weight: bold;">Success Tips for ${location.ward}:</span>\n`;
       const bestCrop = finalRecs[0];
-      response += `• **Top choice:** ${bestCrop.crop.Crop} - ${bestCrop.crop.Variety}\n`;
+      response += `• <span style="color: #16a34a; font-weight: bold;">Top choice:</span> ${bestCrop.crop.Crop} - ${bestCrop.crop.Variety}\n`;
       
       if (location.annual_Rain > 1000) {
-        response += `• **Advantage:** Good rainfall for most crops\n`;
+        response += `• <span style="color: #16a34a; font-weight: bold;">Advantage:</span> Good rainfall for most crops\n`;
       } else if (location.annual_Rain < 600) {
-        response += `• **Strategy:** Focus on drought-resistant varieties\n`;
+        response += `• <span style="color: #16a34a; font-weight: bold;">Strategy:</span> Focus on drought-resistant varieties\n`;
       }
       
       response += `• Visit local agro-dealer for quality seeds\n`;
       response += `• Contact extension officer for guidance\n`;
       
     } else {
-      response += `❌ **Limited options for ${location.ward}**\n\n`;
-      response += `**Suggestions:**\n`;
+      response += `❌ <span style="color: #16a34a; font-weight: bold;">Limited options for ${location.ward}</span>\n\n`;
+      response += `<span style="color: #16a34a; font-weight: bold;">Suggestions:</span>\n`;
       response += `• Try drought-resistant crops (sorghum, millet)\n`;
       response += `• Improve soil with organic matter\n`;
       response += `• Contact KALRO ${location.county} office\n`;
@@ -579,9 +573,9 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
     const recommendations = getLivestockRecommendations(livestockData, location, aezData);
     const aez = determineAEZ(location, aezData);
     
-    let response = `🐄 **Best Livestock for ${location.ward} Ward**\n\n`;
-    response += `📍 **Location:** ${location.ward}, ${location.subcounty}, ${location.county}\n`;
-    response += `🏔️ **Zone:** ${aez.toUpperCase()}\n\n`;
+    let response = `🐄 <span style="color: #16a34a; font-weight: bold;">Best Livestock for ${location.ward} Ward</span>\n\n`;
+    response += `📍 <span style="color: #16a34a; font-weight: bold;">Location:</span> ${location.ward}, ${location.subcounty}, ${location.county}\n`;
+    response += `🏔️ <span style="color: #16a34a; font-weight: bold;">Zone:</span> ${aez.toUpperCase()}\n\n`;
     
     if (recommendations.length > 0) {
       const grouped = recommendations.reduce((acc, rec) => {
@@ -590,30 +584,30 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
         return acc;
       }, {} as Record<string, typeof recommendations>);
       
-      response += `🏆 **Perfect Animals for ${location.ward}:**\n\n`;
+      response += `🏆 <span style="color: #16a34a; font-weight: bold;">Perfect Animals for ${location.ward}:</span>\n\n`;
       Object.entries(grouped).forEach(([type, animals]) => {
-        response += `**${type}**\n`;
+        response += `<span style="color: #16a34a; font-weight: bold;">${type}</span>\n`;
         animals.slice(0, 3).forEach(rec => {
           response += `  • ${rec.livestock.Breed}\n`;
         });
         response += `\n`;
       });
       
-      response += `💡 **Care Tips for ${location.ward}:**\n`;
+      response += `💡 <span style="color: #16a34a; font-weight: bold;">Care Tips for ${location.ward}:</span>\n`;
       if (location.annual_Rain > 1200) {
-        response += `• High rainfall - ensure good drainage in shelters\n`;
-        response += `• Watch for parasites during wet season\n`;
+        response += `• <span style="color: #16a34a; font-weight: bold;">High rainfall</span> - ensure good drainage in shelters\n`;
+        response += `• <span style="color: #16a34a; font-weight: bold;">Watch for parasites</span> during wet season\n`;
       } else if (location.annual_Rain < 600) {
-        response += `• Dry area - ensure reliable water supply\n`;
-        response += `• Choose drought-resistant breeds\n`;
+        response += `• <span style="color: #16a34a; font-weight: bold;">Dry area</span> - ensure reliable water supply\n`;
+        response += `• <span style="color: #16a34a; font-weight: bold;">Choose drought-resistant breeds</span>\n`;
       }
       
       response += `• Contact local veterinary officer\n`;
       response += `• Join livestock farmer groups\n`;
       
     } else {
-      response += `❌ **No specific matches for ${location.ward}**\n\n`;
-      response += `**What to do:**\n`;
+      response += `❌ <span style="color: #16a34a; font-weight: bold;">No specific matches for ${location.ward}</span>\n\n`;
+      response += `<span style="color: #16a34a; font-weight: bold;">What to do:</span>\n`;
       response += `• Contact ${location.county} veterinary office\n`;
       response += `• Visit KALRO regional centers\n`;
     }
@@ -667,9 +661,9 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
     const recommendations = getPastureRecommendations(pastureData, location, aezData);
     const aez = determineAEZ(location, aezData);
     
-    let response = `🌾 **Best Pasture for ${location.ward} Ward**\n\n`;
-    response += `📍 **Location:** ${location.ward}, ${location.subcounty}, ${location.county}\n`;
-    response += `🏔️ **Zone:** ${aez.toUpperCase()}\n\n`;
+    let response = `🌾 <span style="color: #16a34a; font-weight: bold;">Best Pasture for ${location.ward} Ward</span>\n\n`;
+    response += `📍 <span style="color: #16a34a; font-weight: bold;">Location:</span> ${location.ward}, ${location.subcounty}, ${location.county}\n`;
+    response += `🏔️ <span style="color: #16a34a; font-weight: bold;">Zone:</span> ${aez.toUpperCase()}\n\n`;
     
     if (recommendations.length > 0) {
       const grouped = recommendations.reduce((acc, rec) => {
@@ -678,28 +672,28 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
         return acc;
       }, {} as Record<string, typeof recommendations>);
       
-      response += `🏆 **Perfect Pasture for ${location.ward}:**\n\n`;
+      response += `🏆 <span style="color: #16a34a; font-weight: bold;">Perfect Pasture for ${location.ward}:</span>\n\n`;
       Object.entries(grouped).forEach(([type, pastures]) => {
-        response += `**${type}**\n`;
+        response += `<span style="color: #16a34a; font-weight: bold;">${type}</span>\n`;
         pastures.slice(0, 3).forEach(rec => {
-          response += `  • ${rec.pasture.Variety} (${rec.pasture.Type})\n`;
+          response += `  • ${rec.pasture.Variety}\n`;
         });
         response += `\n`;
       });
       
-      response += `🌱 **Growing Tips for ${location.ward}:**\n`;
+      response += `🌱 <span style="color: #16a34a; font-weight: bold;">Growing Tips for ${location.ward}:</span>\n`;
       if (location.annual_Rain > 1000) {
-        response += `• High rainfall - excellent for legumes and Napier grass\n`;
+        response += `• <span style="color: #16a34a; font-weight: bold;">High rainfall</span> - excellent for legumes and Napier grass\n`;
       } else {
-        response += `• Choose drought-tolerant varieties\n`;
+        response += `• <span style="color: #16a34a; font-weight: bold;">Choose drought-tolerant varieties</span>\n`;
       }
       
       response += `• Get quality seeds from certified dealers\n`;
       response += `• Contact extension officer for guidance\n`;
       
     } else {
-      response += `❌ **No specific matches for ${location.ward}**\n\n`;
-      response += `**Try these options:**\n`;
+      response += `❌ <span style="color: #16a34a; font-weight: bold;">No specific matches for ${location.ward}</span>\n\n`;
+      response += `<span style="color: #16a34a; font-weight: bold;">Try these options:</span>\n`;
       response += `• Contact ${location.county} agricultural office\n`;
       response += `• Visit KALRO research stations\n`;
     }
@@ -750,35 +744,35 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
   const generateClimateResponse = (location: ClimateData): string => {
     const aez = determineAEZ(location, aezData);
     
-    let response = `🌡️ **Climate Info for ${location.ward} Ward**\n\n`;
+    let response = `🌡️ <span style="color: #16a34a; font-weight: bold;">Climate Info for ${location.ward} Ward</span>\n\n`;
     
-    response += `📍 **Location:** ${location.ward}, ${location.subcounty}, ${location.county}\n\n`;
+    response += `📍 <span style="color: #16a34a; font-weight: bold;">Location:</span> ${location.ward}, ${location.subcounty}, ${location.county}\n\n`;
     
-    response += `📊 **Weather Summary:**\n`;
-    response += `• **Temperature:** ${location.annual_Temp}°C average\n`;
-    response += `• **Rainfall:** ${location.annual_Rain}mm per year\n`;
-    response += `• **Altitude:** ${location.altitude}m above sea level\n`;
-    response += `• **Soil pH:** ${location.ke_ph}\n`;
-    response += `• **AEZ:** ${aez.toUpperCase()}\n\n`;
+    response += `📊 <span style="color: #16a34a; font-weight: bold;">Weather Summary:</span>\n`;
+    response += `• <span style="color: #16a34a; font-weight: bold;">Temperature:</span> ${location.annual_Temp}°C average\n`;
+    response += `• <span style="color: #16a34a; font-weight: bold;">Rainfall:</span> ${location.annual_Rain}mm per year\n`;
+    response += `• <span style="color: #16a34a; font-weight: bold;">Altitude:</span> ${location.altitude}m above sea level\n`;
+    response += `• <span style="color: #16a34a; font-weight: bold;">Soil pH:</span> ${location.ke_ph}\n`;
+    response += `• <span style="color: #16a34a; font-weight: bold;">AEZ:</span> ${aez.toUpperCase()}\n\n`;
     
-    response += `🌿 **What This Means for ${location.ward}:**\n\n`;
+    response += `🌿 <span style="color: #16a34a; font-weight: bold;">What This Means for ${location.ward}:</span>\n\n`;
     
     if (location.annual_Temp > 25) {
-      response += `🔥 **Hot Climate:**\n• Perfect for: Cassava, mango, cotton, sorghum\n• Strategy: Early morning/evening planting\n\n`;
+      response += `🔥 <span style="color: #16a34a; font-weight: bold;">Hot Climate:</span>\n• Perfect for: Cassava, mango, cotton, sorghum\n• Strategy: Early morning/evening planting\n\n`;
     } else if (location.annual_Temp > 20) {
-      response += `🌤️ **Warm Climate:**\n• Perfect for: Maize, beans, vegetables, bananas\n• Strategy: Most crops do well\n\n`;
+      response += `🌤️ <span style="color: #16a34a; font-weight: bold;">Warm Climate:</span>\n• Perfect for: Maize, beans, vegetables, bananas\n• Strategy: Most crops do well\n\n`;
     } else if (location.annual_Temp > 15) {
-      response += `🌥️ **Cool Climate:**\n• Perfect for: Wheat, potatoes, cabbage, tea\n• Strategy: Cool season crops\n\n`;
+      response += `🌥️ <span style="color: #16a34a; font-weight: bold;">Cool Climate:</span>\n• Perfect for: Wheat, potatoes, cabbage, tea\n• Strategy: Cool season crops\n\n`;
     } else {
-      response += `❄️ **Cool Highland:**\n• Perfect for: Tea, coffee, pyrethrum\n• Strategy: High-value crops\n\n`;
+      response += `❄️ <span style="color: #16a34a; font-weight: bold;">Cool Highland:</span>\n• Perfect for: Tea, coffee, pyrethrum\n• Strategy: High-value crops\n\n`;
     }
     
     if (location.annual_Rain > 1200) {
-      response += `🌧️ **High Rainfall:**\n• Excellent for: Rice, bananas, tea, coffee\n• Watch for: Fungal diseases\n• Strategy: Good drainage essential\n`;
+      response += `🌧️ <span style="color: #16a34a; font-weight: bold;">High Rainfall:</span>\n• Excellent for: Rice, bananas, tea, coffee\n• Watch for: Fungal diseases\n• Strategy: Good drainage essential\n`;
     } else if (location.annual_Rain > 800) {
-      response += `🌦️ **Good Rainfall:**\n• Suitable for: Most crops with minimal irrigation\n• Strategy: Water storage for dry season\n`;
+      response += `🌦️ <span style="color: #16a34a; font-weight: bold;">Good Rainfall:</span>\n• Suitable for: Most crops with minimal irrigation\n• Strategy: Water storage for dry season\n`;
     } else {
-      response += `☀️ **Low Rainfall:**\n• Focus on: Drought-resistant crops\n• Essential: Water harvesting and drip irrigation\n`;
+      response += `☀️ <span style="color: #16a34a; font-weight: bold;">Low Rainfall:</span>\n• Focus on: Drought-resistant crops\n• Essential: Water harvesting and drip irrigation\n`;
     }
     
     return response;
@@ -796,13 +790,13 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
       const counties = [...new Set(climateData.map(d => d.county))].sort();
       const sampleWards = climateData.slice(0, 8);
       
-      let response = `❓ **I need your specific location to help you!**\n\n`;
-      response += `**Available Counties:** ${counties.slice(0, 6).join(', ')}\n\n`;
-      response += `**Example Wards:**\n`;
+      let response = `❓ <span style="color: #16a34a; font-weight: bold;">I need your specific location to help you!</span>\n\n`;
+      response += `<span style="color: #16a34a; font-weight: bold;">Available Counties:</span> ${counties.slice(0, 6).join(', ')}\n\n`;
+      response += `<span style="color: #16a34a; font-weight: bold;">Example Wards:</span>\n`;
       sampleWards.forEach(ward => {
-        response += `• **${ward.ward}** (${ward.subcounty}, ${ward.county})\n`;
+        response += `• <span style="color: #16a34a; font-weight: bold;">${ward.ward}</span> (${ward.subcounty}, ${ward.county})\n`;
       });
-      response += `\n**Try asking:**\n`;
+      response += `\n<span style="color: #16a34a; font-weight: bold;">Try asking:</span>\n`;
       response += `• "What crops for ${sampleWards[0].ward} ward?"\n`;
       response += `• "Climate in ${sampleWards[1].ward} ward"\n`;
       response += `• "Livestock for ${sampleWards[2].ward} ward"\n`;
@@ -811,7 +805,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
       return {
         id: (Date.now() + 1).toString(),
         type: 'bot',
-        content: response,
+        content: "🌾 <span style=\"color: #16a34a; font-weight: bold;\">Hello! I'm your KALRO Agricultural AI Assistant</span> 🤖\n\nWhat do you want to know about?\n\n🌱 <span style=\"color: #16a34a; font-weight: bold;\">Crops</span> - What to plant in your area\n🐄 <span style=\"color: #16a34a; font-weight: bold;\">Livestock</span> - Best animals for your farm\n🌾 <span style=\"color: #16a34a; font-weight: bold;\">Pasture</span> - Fodder and grass recommendations",
         timestamp: new Date()
       };
     }
@@ -962,7 +956,10 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
                         ? 'bg-green-600 text-white'
                         : 'bg-gray-100 text-gray-800'
                     }`}>
-                      <div className="text-sm whitespace-pre-line">{message.content}</div>
+                      <div 
+                        className="text-sm whitespace-pre-line" 
+                        dangerouslySetInnerHTML={{ __html: message.content }}
+                      />
                       <div className={`text-xs mt-1 ${
                         message.type === 'user' ? 'text-green-100' : 'text-gray-500'
                       }`}>
