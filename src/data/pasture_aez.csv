@@ -1,0 +1,100 @@
+Pasture/fodder,Type,Variety,AEZ
+Pasture,Rhodes grass,Boma rhodes,zone II
+Pasture,Rhodes grass,Pokot,zone II
+Pasture,Rhodes grass,Boma rhodes,zone III
+Pasture,Rhodes grass,Pokot,zone III
+Pasture,Rhodes grass,Boma rhodes,zone IV
+Pasture,Rhodes grass,Pokot,zone IV
+Pasture,Bracharia,Basilisk,zone III
+Pasture,Bracharia,Piata,zone III
+Pasture,Bracharia,MG4,zone III
+Pasture,Bracharia,Xaraes,zone III
+Pasture,Bracharia,Mulato 1,zone III
+Pasture,Bracharia,Mulato 2,zone III
+Pasture,Kikuyu grass,Kenda,zone II
+Pasture,Nandi setaria,Nandi setaria,zone II
+Pasture,Congo,Congo signal,zone II
+Pasture,Paspalum,Paspalum,zone II
+Pasture,Kikuyu grass,Kenda,zone III
+Pasture,Nandi setaria,Nandi setaria,zone III
+Pasture,Congo,Congo signal,zone III
+Pasture,Paspalum,Paspalum,zone III
+Pasture,Jaragua,Jaragua,zone IV
+Pasture,Giant thatching,Giant thatching,zone IV
+Pasture,Masai love grass,Veld,zone IV
+Pasture,Masai love grass,Sawtooth,zone IV
+Pasture,Masai love grass,Wilmann,zone IV
+Pasture,Jaragua,Jaragua,zone V
+Pasture,Giant thatching,Giant thatching,zone V
+Pasture,Masai love grass,Veld,zone V
+Pasture,Masai love grass,Sawtooth,zone V
+Pasture,Masai love grass,Wilmann,zone V
+Pasture,Star grass,Star grass,zone II
+Legume,Lucerne/Alfa,Aurora,zone II
+Legume,Lucerne/Alfa,Hairy peruvian,zone II
+Legume,Lucerne/Alfa,Cuf 101,zone II
+Legume,Lucerne/Alfa,Hunter river,zone II
+Legume,Desmodium,Green leaf,zone II
+Legume,Desmodium,Silver leaf,zone II
+Legume,Centro ,Centro ,zone II
+Pasture,Star grass,Star grass,zone III
+Legume,Lucerne/Alfa,Aurora,zone III
+Legume,Lucerne/Alfa,Hairy peruvian,zone III
+Legume,Lucerne/Alfa,Cuf 101,zone III
+Legume,Lucerne/Alfa,Hunter river,zone III
+Legume,Desmodium,Green leaf,zone III
+Legume,Desmodium,Silver leaf,zone III
+Legume,Centro ,Centro ,zone III
+Legume,Sesbania,Grand flora,zone III
+Legume,Sesbania,Sesban,zone III
+Legume,Sesbania,Grand flora,zone IV
+Legume,Sesbania,Sesban,zone IV
+Legume,Leuceana,Leuceana,zone II
+Legume,Leuceana,Leuceana,zone III
+Legume,Leuceana,Leuceana,zone IV
+Legume,Vetch,Vetch,zone II
+Tree\shrub,Acacia,Senegal,zone IV
+Tree\shrub,Acacia,Totiris,zone IV
+Tree\shrub,Acacia,Seyan,zone IV
+Tree\shrub,Acacia,Gerrardii,zone IV
+Tree\shrub,Albizia,Albizia,zone IV
+Tree\shrub,Caliandra,Caliandra,zone IV
+Tree\shrub,Palida,Palida,zone IV
+Tree\shrub,Acacia,Senegal,zone V
+Tree\shrub,Acacia,Totiris,zone V
+Tree\shrub,Acacia,Seyan,zone V
+Tree\shrub,Acacia,Gerrardii,zone V
+Tree\shrub,Albizia,Albizia,zone V
+Tree\shrub,Caliandra,Caliandra,zone V
+Tree\shrub,Palida,Palida,zone V
+Tree\shrub,Acacia,Senegal,zone VI
+Tree\shrub,Acacia,Totiris,zone VI
+Tree\shrub,Acacia,Seyan,zone VI
+Tree\shrub,Acacia,Gerrardii,zone VI
+Tree\shrub,Albizia,Albizia,zone VI
+Tree\shrub,Caliandra,Caliandra,zone VI
+Tree\shrub,Palida,Palida,zone VI
+Tree\shrub,Moringa,Moringa,zone IV
+Tree\shrub,Moringa,Moringa,zone V
+Tree\shrub,Mulberry,Mulberry,zone II
+Fodder,Nappier grass,Kakamega 1,zone II
+Fodder,Nappier grass,Kakamega 2,zone II
+Fodder,Sorghum,E 6518,zone II
+Fodder,Sorghum,E 1291,zone II
+Fodder,Sorghum,Ikinyaruka,zone II
+Tree\shrub,Mulberry,Mulberry,zone III
+Fodder,Nappier grass,Kakamega 1,zone III
+Fodder,Nappier grass,Kakamega 2,zone III
+Fodder,Sorghum,E 6518,zone III
+Fodder,Sorghum,E 1291,zone III
+Fodder,Sorghum,Ikinyaruka,zone III
+Tree\shrub,Mulberry,Mulberry,zone IV
+Fodder,Nappier grass,Kakamega 1,zone IV
+Fodder,Nappier grass,Kakamega 2,zone IV
+Fodder,Sorghum,E 6518,zone IV
+Fodder,Sorghum,E 1291,zone IV
+Fodder,Sorghum,Ikinyaruka,zone IV
+Fodder,Oats,Oats,zone II
+Fodder,Sweet potatoe vines,Wangaborige,zone II
+Fodder,Oats,Oats,zone III
+Fodder,Sweet potatoe vines,Wangaborige,zone III
