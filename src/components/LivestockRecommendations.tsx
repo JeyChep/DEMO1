@@ -93,17 +93,6 @@ export const LivestockRecommendations: React.FC<LivestockRecommendationsProps> =
                           <div className="flex-1">
                             <div className="flex items-center gap-3 mb-2">
                               <h6 className="font-medium text-gray-800">{recommendation.livestock.Breed}</h6>
-                              <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                recommendation.suitabilityScore === 100 ? 'text-green-600 bg-green-100' : 'text-red-600 bg-red-100'
-                              }`}>
-                                {recommendation.suitabilityScore}% {recommendation.suitabilityScore === 100 ? 'Perfect Match' : 'Not Suitable'}
-                              </div>
-                            </div>
-                            
-                            {/* Quick Info */}
-                            <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
-                              <div>🏔️ Suitable AEZ: {recommendation.livestock.AEZ.toUpperCase()}</div>
-                              <div>📍 Your Ward AEZ: {recommendation.zone.toUpperCase()}</div>
                             </div>
                           </div>
                           

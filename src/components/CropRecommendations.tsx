@@ -218,34 +218,6 @@ export const CropRecommendations: React.FC<CropRecommendationsProps> = ({
                                       <div className="flex-1">
                                         <div className="flex items-center gap-3 mb-2">
                                           <h6 className="font-medium text-gray-800">{recommendation.crop.Variety}</h6>
-                                          <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                            recommendation.suitabilityScore >= 80 ? 'text-green-600 bg-green-100' :
-                                            recommendation.suitabilityScore >= 60 ? 'text-yellow-600 bg-yellow-100' :
-                                            'text-red-600 bg-red-100'
-                                          }`}>
-                                            {recommendation.suitabilityScore}% Suitable
-                                          </div>
-                                        </div>
-                                        
-                                        {/* Quick Info */}
-                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs text-gray-600">
-                                          <div>🌡️ {recommendation.crop.minTemp}-{recommendation.crop.maxTemp}°C</div>
-                                          <div>🌧️ {recommendation.crop.minPrep}-{recommendation.crop.maxPrep}mm</div>
-                                          <div>⛰️ {recommendation.crop.minAlti}-{recommendation.crop.maxAlti}m</div>
-                                          <div>🧪 pH {recommendation.crop.minpH}-{recommendation.crop.maxpH}</div>
-                                        </div>
-                                        
-                                        {/* Quick Features */}
-                                        <div className="flex items-center gap-2 mt-2">
-                                          {recommendation.crop.drought_tolerant === 1 && (
-                                            <span className="px-2 py-1 bg-amber-100 text-amber-700 text-xs rounded-full">Drought Tolerant</span>
-                                          )}
-                                          {recommendation.crop.pest_tolerant === 1 && (
-                                            <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">Pest Resistant</span>
-                                          )}
-                                          {recommendation.crop.availability === 1 && (
-                                            <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">Seeds Available</span>
-                                          )}
                                         </div>
                                       </div>
                                       
