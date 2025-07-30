@@ -530,36 +530,6 @@ function App() {
             </div>
           </div>
 
-          {/* Regional Centers */}
-          <div className="mt-8 bg-green-700 rounded-lg p-6">
-            <h4 className="font-semibold mb-4 text-center">KALRO Regional Research Centers</h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-              <div>
-                <p className="font-medium text-green-200">Central Kenya</p>
-                <p className="text-green-100">Embu, Kabete, Muguga</p>
-              </div>
-              <div>
-                <p className="font-medium text-green-200">Western Kenya</p>
-                <p className="text-green-100">Kakamega, Kitale, Kisii</p>
-              </div>
-              <div>
-                <p className="font-medium text-green-200">Eastern Kenya</p>
-                <p className="text-green-100">Katumani, Kiboko, Mtwapa</p>
-              </div>
-              <div>
-                <p className="font-medium text-green-200">Rift Valley</p>
-                <p className="text-green-100">Njoro, Lanet, Perkerra</p>
-              </div>
-              <div>
-                <p className="font-medium text-green-200">Northern Kenya</p>
-                <p className="text-green-100">Marsabit, Garissa</p>
-              </div>
-              <div>
-                <p className="font-medium text-green-200">Coast Region</p>
-                <p className="text-green-100">Mtwapa, Msabaha</p>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 

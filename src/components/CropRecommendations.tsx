@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sprout, DollarSign, TrendingUp } from 'lucide-react';
+import { Sprout, DollarSign, TrendingUp, ChevronDown, ChevronRight, Info } from 'lucide-react';
 import { CropRecommendation, CropRecommendationWithEconomics } from '../types';
 import { CropCard } from './CropCard';
 import { CropCardWithEconomics } from './CropCardWithEconomics';
@@ -16,6 +16,9 @@ export const CropRecommendations: React.FC<CropRecommendationsProps> = ({
 }) => {
   const [minSuitability, setMinSuitability] = React.useState<number>(60);
   const [sortBy, setSortBy] = React.useState<'suitability' | 'profitability' | 'risk'>('suitability');
+  const [expandedTypes, setExpandedTypes] = React.useState<Set<string>>(new Set());
+  const [expandedCrops, setExpandedCrops] = React.useState<Set<string>>(new Set());
+  const [showDetails, setShowDetails] = React.useState<Set<string>>(new Set());
   
   const filteredRecommendations = recommendations.filter(rec => rec.suitabilityScore >= minSuitability);
   
@@ -34,6 +37,36 @@ export const CropRecommendations: React.FC<CropRecommendationsProps> = ({
   });
   
   const groupedCrops = groupCropsByTypeAndCrop(sortedRecommendations);
+
+  const toggleType = (type: string) => {
+    const newExpanded = new Set(expandedTypes);
+    if (newExpanded.has(type)) {
+      newExpanded.delete(type);
+    } else {
+      newExpanded.add(type);
+    }
+    setExpandedTypes(newExpanded);
+  };
+
+  const toggleCrop = (cropKey: string) => {
+    const newExpanded = new Set(expandedCrops);
+    if (newExpanded.has(cropKey)) {
+      newExpanded.delete(cropKey);
+    } else {
+      newExpanded.add(cropKey);
+    }
+    setExpandedCrops(newExpanded);
+  };
+
+  const toggleDetails = (varietyKey: string) => {
+    const newDetails = new Set(showDetails);
+    if (newDetails.has(varietyKey)) {
+      newDetails.delete(varietyKey);
+    } else {
+      newDetails.add(varietyKey);
+    }
+    setShowDetails(newDetails);
+  };
 
   if (recommendations.length === 0) {
     return (
@@ -124,37 +157,130 @@ export const CropRecommendations: React.FC<CropRecommendationsProps> = ({
             
           <div className="space-y-8">
             {Object.entries(groupedCrops).map(([type, crops]) => (
-              <div key={type} className="space-y-6">
-                <div className="border-l-4 border-green-500 pl-4">
-                  <h4 className="text-xl font-bold text-gray-800 mb-2">{type}</h4>
-                  <p className="text-gray-600 text-sm">
-                    {Object.keys(crops).length} crop{Object.keys(crops).length !== 1 ? 's' : ''} available
-                  </p>
+              <div key={type} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                {/* Type Header - Clickable */}
+                <button
+                  onClick={() => toggleType(type)}
+                  className="w-full flex items-center justify-between p-4 bg-green-50 hover:bg-green-100 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
+                      <Sprout className="w-4 h-4 text-white" />
+                    </div>
+                    <div className="text-left">
+                      <h4 className="text-lg font-bold text-gray-800">{type}</h4>
+                      <p className="text-sm text-gray-600">
+                        {Object.keys(crops).length} crop{Object.keys(crops).length !== 1 ? 's' : ''} available
+                      </p>
+                    </div>
+                  </div>
+                  {expandedTypes.has(type) ? 
+                    <ChevronDown className="w-5 h-5 text-gray-600" /> : 
+                    <ChevronRight className="w-5 h-5 text-gray-600" />
+                  }
+                </button>
+                
+                {/* Crops List - Only show when type is expanded */}
+                {expandedTypes.has(type) && (
+                  <div className="border-t border-gray-200">
+                    {Object.entries(crops).map(([cropName, varieties]) => {
+                      const cropKey = `${type}-${cropName}`;
+                      return (
+                        <div key={cropName} className="border-b border-gray-100 last:border-b-0">
+                          {/* Crop Header - Clickable */}
+                          <button
+                            onClick={() => toggleCrop(cropKey)}
+                            className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                          >
+                            <div className="text-left">
+                              <h5 className="text-md font-semibold text-gray-800">{cropName}</h5>
+                              <p className="text-sm text-gray-600">
+                                {varieties.length} variet{varieties.length !== 1 ? 'ies' : 'y'} suitable
+                              </p>
+                            </div>
+                            {expandedCrops.has(cropKey) ? 
+                              <ChevronDown className="w-4 h-4 text-gray-600" /> : 
+                              <ChevronRight className="w-4 h-4 text-gray-600" />
+                            }
+                          </button>
+                          
+                          {/* Varieties List - Only show when crop is expanded */}
+                          {expandedCrops.has(cropKey) && (
+                            <div className="bg-white">
+                              {varieties.map((recommendation, index) => {
+                                const varietyKey = `${cropKey}-${recommendation.crop.Variety}`;
+                                const showDetailCard = showDetails.has(varietyKey);
+                                
+                                return (
+                                  <div key={index} className="border-b border-gray-100 last:border-b-0">
+                                    {/* Variety Summary */}
+                                    <div className="p-4 flex items-center justify-between">
+                                      <div className="flex-1">
+                                        <div className="flex items-center gap-3 mb-2">
+                                          <h6 className="font-medium text-gray-800">{recommendation.crop.Variety}</h6>
+                                          <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                            recommendation.suitabilityScore >= 80 ? 'text-green-600 bg-green-100' :
+                                            recommendation.suitabilityScore >= 60 ? 'text-yellow-600 bg-yellow-100' :
+                                            'text-red-600 bg-red-100'
+                                          }`}>
+                                            {recommendation.suitabilityScore}% Suitable
+                                          </div>
+                                        </div>
+                                        
+                                        {/* Quick Info */}
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs text-gray-600">
+                                          <div>🌡️ {recommendation.crop.minTemp}-{recommendation.crop.maxTemp}°C</div>
+                                          <div>🌧️ {recommendation.crop.minPrep}-{recommendation.crop.maxPrep}mm</div>
+                                          <div>⛰️ {recommendation.crop.minAlti}-{recommendation.crop.maxAlti}m</div>
+                                          <div>🧪 pH {recommendation.crop.minpH}-{recommendation.crop.maxpH}</div>
+                                        </div>
+                                        
+                                        {/* Quick Features */}
+                                        <div className="flex items-center gap-2 mt-2">
+                                          {recommendation.crop.drought_tolerant === 1 && (
+                                            <span className="px-2 py-1 bg-amber-100 text-amber-700 text-xs rounded-full">Drought Tolerant</span>
+                                          )}
+                                          {recommendation.crop.pest_tolerant === 1 && (
+                                            <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">Pest Resistant</span>
+                                          )}
+                                          {recommendation.crop.availability === 1 && (
+                                            <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">Seeds Available</span>
+                                          )}
+                                        </div>
+                                      </div>
+                                      
+                                      {/* Details Button */}
+                                      <button
+                                        onClick={() => toggleDetails(varietyKey)}
+                                        className="ml-4 flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                                      >
+                                        <Info className="w-4 h-4" />
+                                        {showDetailCard ? 'Hide Details' : 'Show Details'}
+                                      </button>
+                                    </div>
+                                    
+                                    {/* Detailed Card - Only show when details button is clicked */}
+                                    {showDetailCard && (
+                                      <div className="px-4 pb-4">
+                                        {showEconomics && 'economics' in recommendation ? (
+                                          <CropCardWithEconomics recommendation={recommendation as CropRecommendationWithEconomics} />
+                                        ) : (
+                                          <CropCard recommendation={recommendation} />
+                                        )}
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
                 </div>
                 
-                <div className="space-y-6">
-                  {Object.entries(crops).map(([cropName, varieties]) => (
-                    <div key={cropName} className="bg-gray-50 rounded-lg p-6">
-                      <div className="mb-4">
-                        <h5 className="text-lg font-semibold text-gray-800 mb-1">{cropName}</h5>
-                        <p className="text-gray-600 text-sm">
-                          {varieties.length} variet{varieties.length !== 1 ? 'ies' : 'y'} suitable for your location
-                        </p>
-                      </div>
-                      
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        {varieties.map((recommendation, index) => (
-                          showEconomics && 'economics' in recommendation ? (
-                            <CropCardWithEconomics key={index} recommendation={recommendation as CropRecommendationWithEconomics} />
-                          ) : (
-                            <CropCard key={index} recommendation={recommendation} />
-                          )
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
             ))}
           </div>
           </>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Wheat } from 'lucide-react';
+import { Wheat, ChevronDown, ChevronRight, Info } from 'lucide-react';
 import { PastureRecommendation } from '../types';
 import { PastureCard } from './PastureCard';
 import { groupPastureByType } from '../utils/aezMatcher';
@@ -9,7 +9,30 @@ interface PastureRecommendationsProps {
 }
 
 export const PastureRecommendations: React.FC<PastureRecommendationsProps> = ({ recommendations }) => {
+  const [expandedTypes, setExpandedTypes] = React.useState<Set<string>>(new Set());
+  const [showDetails, setShowDetails] = React.useState<Set<string>>(new Set());
+  
   const groupedPasture = groupPastureByType(recommendations);
+
+  const toggleType = (type: string) => {
+    const newExpanded = new Set(expandedTypes);
+    if (newExpanded.has(type)) {
+      newExpanded.delete(type);
+    } else {
+      newExpanded.add(type);
+    }
+    setExpandedTypes(newExpanded);
+  };
+
+  const toggleDetails = (varietyKey: string) => {
+    const newDetails = new Set(showDetails);
+    if (newDetails.has(varietyKey)) {
+      newDetails.delete(varietyKey);
+    } else {
+      newDetails.add(varietyKey);
+    }
+    setShowDetails(newDetails);
+  };
 
   if (recommendations.length === 0) {
     return (
@@ -33,20 +56,80 @@ export const PastureRecommendations: React.FC<PastureRecommendationsProps> = ({ 
 
         <div className="space-y-8">
           {Object.entries(groupedPasture).map(([type, pastures]) => (
-            <div key={type} className="space-y-6">
-              <div className="border-l-4 border-amber-500 pl-4">
-                <h4 className="text-xl font-bold text-gray-800 mb-2">{type}</h4>
-                <p className="text-gray-600 text-sm">
-                  {pastures.length} variet{pastures.length !== 1 ? 'ies' : 'y'} suitable for your area
-                </p>
+            <div key={type} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              {/* Type Header - Clickable */}
+              <button
+                onClick={() => toggleType(type)}
+                className="w-full flex items-center justify-between p-4 bg-amber-50 hover:bg-amber-100 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-amber-600 rounded-full flex items-center justify-center">
+                    <Wheat className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="text-left">
+                    <h4 className="text-lg font-bold text-gray-800">{type}</h4>
+                    <p className="text-sm text-gray-600">
+                      {pastures.length} variet{pastures.length !== 1 ? 'ies' : 'y'} suitable for your area
+                    </p>
+                  </div>
+                </div>
+                {expandedTypes.has(type) ? 
+                  <ChevronDown className="w-5 h-5 text-gray-600" /> : 
+                  <ChevronRight className="w-5 h-5 text-gray-600" />
+                }
+              </button>
+              
+              {/* Varieties List - Only show when type is expanded */}
+              {expandedTypes.has(type) && (
+                <div className="border-t border-gray-200 bg-white">
+                  {pastures.map((recommendation, index) => {
+                    const varietyKey = `${type}-${recommendation.pasture.Variety}`;
+                    const showDetailCard = showDetails.has(varietyKey);
+                    
+                    return (
+                      <div key={index} className="border-b border-gray-100 last:border-b-0">
+                        {/* Variety Summary */}
+                        <div className="p-4 flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <h6 className="font-medium text-gray-800">{recommendation.pasture.Variety}</h6>
+                              <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                recommendation.suitabilityScore === 100 ? 'text-green-600 bg-green-100' : 'text-red-600 bg-red-100'
+                              }`}>
+                                {recommendation.suitabilityScore}% {recommendation.suitabilityScore === 100 ? 'Perfect Match' : 'Not Suitable'}
+                              </div>
+                            </div>
+                            
+                            {/* Quick Info */}
+                            <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
+                              <div>🌾 Type: {recommendation.pasture.Type}</div>
+                              <div>🏔️ Suitable AEZ: {recommendation.pasture.AEZ.toUpperCase()}</div>
+                            </div>
+                          </div>
+                          
+                          {/* Details Button */}
+                          <button
+                            onClick={() => toggleDetails(varietyKey)}
+                            className="ml-4 flex items-center gap-2 px-3 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors text-sm"
+                          >
+                            <Info className="w-4 h-4" />
+                            {showDetailCard ? 'Hide Details' : 'Show Details'}
+                          </button>
+                        </div>
+                        
+                        {/* Detailed Card - Only show when details button is clicked */}
+                        {showDetailCard && (
+                          <div className="px-4 pb-4">
+                            <PastureCard recommendation={recommendation} />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
               </div>
               
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {pastures.map((recommendation, index) => (
-                  <PastureCard key={index} recommendation={recommendation} />
-                ))}
-              </div>
-            </div>
           ))}
         </div>
       </div>
