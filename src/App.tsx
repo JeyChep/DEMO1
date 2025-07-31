@@ -35,6 +35,8 @@ function App() {
   const [dataError, setDataError] = useState<string>('');
   const [showLocationMap, setShowLocationMap] = useState<boolean>(false);
   const [showEconomics, setShowEconomics] = useState<boolean>(false);
+  const [selectedCounty, setSelectedCounty] = useState<string>('');
+  const [selectedSubcounty, setSelectedSubcounty] = useState<string>('');
 
   useEffect(() => {
     const loadData = async () => {
