@@ -310,10 +310,13 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
 
       return {
         id: Date.now().toString(),
-        text: `🌾 Top Recommended Crops for ${location.ward} Ward:`,
+        text: `🌾 **Top Recommended Crops for ${location.ward} Ward:**
+
+${Object.entries(groupedCrops).map(([cropName, varieties]) => 
+  `**${cropName}**\n${varieties.map(rec => `• ${rec.crop.Variety}`).join('  ')}`
+).join('\n\n')}`,
         isBot: true,
-        timestamp: new Date(),
-        cards: [createSimpleCropList(groupedCrops, location)]
+        timestamp: new Date()
       };
     }
 
