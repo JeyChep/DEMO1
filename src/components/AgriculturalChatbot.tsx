@@ -52,14 +52,14 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
   const findLocation = (query: string): ClimateData | null => {
     const normalizedQuery = query.toLowerCase();
     
-    // Try exact matches first (ward, subcounty, county)
+    // Try exact matches first
     let location = climateData.find(loc => 
       loc.ward.toLowerCase() === normalizedQuery ||
       loc.subcounty.toLowerCase() === normalizedQuery ||
       loc.county.toLowerCase() === normalizedQuery
     );
 
-    // If no exact match, try partial matches with better fuzzy matching
+    // If no exact match, try partial matches
     if (!location) {
       location = climateData.find(loc => 
         loc.ward.toLowerCase().includes(normalizedQuery) ||
@@ -67,45 +67,11 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
         loc.county.toLowerCase().includes(normalizedQuery) ||
         normalizedQuery.includes(loc.ward.toLowerCase()) ||
         normalizedQuery.includes(loc.subcounty.toLowerCase()) ||
-        normalizedQuery.includes(loc.county.toLowerCase()) ||
-        // Add fuzzy matching for common misspellings
-        fuzzyMatch(loc.ward.toLowerCase(), normalizedQuery) ||
-        fuzzyMatch(loc.subcounty.toLowerCase(), normalizedQuery) ||
-        fuzzyMatch(loc.county.toLowerCase(), normalizedQuery)
+        normalizedQuery.includes(loc.county.toLowerCase())
       );
     }
 
     return location || null;
-  };
-
-  const fuzzyMatch = (str1: string, str2: string): boolean => {
-    // Simple fuzzy matching for common misspellings
-    const distance = levenshteinDistance(str1, str2);
-    return distance <= 2 && str1.length > 3; // Allow 2 character differences for words longer than 3
-  };
-
-  const levenshteinDistance = (str1: string, str2: string): number => {
-    const matrix = [];
-    for (let i = 0; i <= str2.length; i++) {
-      matrix[i] = [i];
-    }
-    for (let j = 0; j <= str1.length; j++) {
-      matrix[0][j] = j;
-    }
-    for (let i = 1; i <= str2.length; i++) {
-      for (let j = 1; j <= str1.length; j++) {
-        if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
-          matrix[i][j] = matrix[i - 1][j - 1];
-        } else {
-          matrix[i][j] = Math.min(
-            matrix[i - 1][j - 1] + 1,
-            matrix[i][j - 1] + 1,
-            matrix[i - 1][j] + 1
-          );
-        }
-      }
-    }
-    return matrix[str2.length][str1.length];
   };
 
   const extractLocationFromQuery = (query: string): ClimateData | null => {
@@ -125,33 +91,6 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
 
     return null;
   };
-
-  const createCropTypeCard = (cropType: string, crops: Record<string, CropRecommendation[]>) => (
-    <div key={cropType} className="bg-white rounded-lg border border-green-200 p-4 mb-3 min-w-[300px]">
-      <div className="flex items-center gap-2 mb-3">
-        <Leaf className="w-5 h-5 text-green-600" />
-        <h4 className="text-lg font-bold text-green-600">{cropType}</h4>
-      </div>
-      
-      <div className="space-y-3">
-        {Object.entries(crops).map(([cropName, varieties]) => (
-          <div key={cropName}>
-            <h5 className="font-semibold text-gray-800 mb-2">{cropName}</h5>
-            <div className="flex flex-wrap gap-2">
-              {varieties.slice(0, 6).map((rec, idx) => (
-                <span key={idx} className="bg-green-100 px-2 py-1 rounded-full text-green-800 text-xs font-medium">
-                  {rec.crop.Variety}
-                </span>
-              ))}
-              {varieties.length > 6 && (
-                <span className="text-gray-500 text-xs">+{varieties.length - 6} more</span>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
 
   const createDetailedCropCard = (rec: CropRecommendation) => (
     <div className="bg-white rounded-lg border border-green-200 p-4 max-w-md">
@@ -325,20 +264,27 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
       }
 
       const groupedCrops = groupCropsByTypeAndCrop(suitableCrops);
-      const cards = Object.entries(groupedCrops).map(([type, crops]) => 
-        createCropTypeCard(type, crops)
-      );
+      
+      // Create text-based crop list organized by type
+      let cropText = `🌾 **Top Recommended Crops for ${location.ward} Ward, ${location.subcounty}**\n\n📍 **Climate:** ${location.annual_Temp.toFixed(1)}°C, ${location.annual_Rain}mm rain, ${location.altitude}m altitude\n\n`;
+      
+      Object.entries(groupedCrops).forEach(([type, crops]) => {
+        const typeIcon = type === 'Cereal' ? '🌾' : type === 'Fruit' ? '🍎' : type === 'Vegetable' ? '🥬' : type === 'Legume' ? '🌱' : '🌿';
+        cropText += `${typeIcon} **${type.toUpperCase()}**\n`;
+        
+        Object.entries(crops).forEach(([cropName, varieties]) => {
+          const varietyNames = varieties.slice(0, 6).map(rec => rec.crop.Variety).join('  •  ');
+          const moreCount = varieties.length > 6 ? `  (+${varieties.length - 6} more)` : '';
+          cropText += `**${cropName}:** ${varietyNames}${moreCount}\n`;
+        });
+        cropText += '\n';
+      });
 
       return {
         id: Date.now().toString(),
-        text: `🌾 **Crop Recommendations for ${location.ward} Ward, ${location.subcounty}**
-
-📍 **Climate:** ${location.annual_Temp.toFixed(1)}°C, ${location.annual_Rain}mm rain, ${location.altitude}m altitude
-
-Found **${suitableCrops.length} suitable crop varieties** across **${Object.keys(groupedCrops).length} categories**:`,
+        text: cropText,
         isBot: true,
-        timestamp: new Date(),
-        cards
+        timestamp: new Date()
       };
     }
 
