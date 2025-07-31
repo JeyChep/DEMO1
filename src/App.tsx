@@ -236,6 +236,11 @@ function App() {
         
         console.log(`Found closest location: ${closest.ward}, ${closest.subcounty}, ${closest.county} (${minDistance.toFixed(2)}km away)`);
         setSelectedLocation(closest);
+        
+        // Auto-fill the location selector dropdowns
+        setSelectedCounty(closest.county);
+        setSelectedSubcounty(closest.subcounty);
+        
         setLocationError('');
       },
       (error) => {
