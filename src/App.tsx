@@ -554,13 +554,8 @@ function App() {
               <Leaf className="w-5 h-5 text-green-600" />
               <p className="font-semibold">KALRO Selector</p>
             </div>
-            <p className="mb-2">Empowering Kenyan Farmers with Science-Based Agricultural Decisions</p>
-            <p className="text-sm">
-              Powered by Kenya Agricultural & Livestock Research Organization (KALRO) • 
-              Based on Agro-Ecological Zones and comprehensive agricultural research
-            </p>
-            <p className="text-xs text-gray-500 mt-2">
-              © 2024 KALRO. All rights reserved. • For technical support, contact KALRO ICT Department
+            <p className="text-xs text-gray-500">
+              © 2024 KALRO. All rights reserved.
             </p>
           </div>
         </div>
