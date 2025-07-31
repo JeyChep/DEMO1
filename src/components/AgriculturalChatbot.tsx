@@ -69,9 +69,9 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
         normalizedQuery.includes(loc.subcounty.toLowerCase()) ||
         normalizedQuery.includes(loc.county.toLowerCase()) ||
         // Add fuzzy matching for common misspellings
-        this.fuzzyMatch(loc.ward.toLowerCase(), normalizedQuery) ||
-        this.fuzzyMatch(loc.subcounty.toLowerCase(), normalizedQuery) ||
-        this.fuzzyMatch(loc.county.toLowerCase(), normalizedQuery)
+        fuzzyMatch(loc.ward.toLowerCase(), normalizedQuery) ||
+        fuzzyMatch(loc.subcounty.toLowerCase(), normalizedQuery) ||
+        fuzzyMatch(loc.county.toLowerCase(), normalizedQuery)
       );
     }
 
