@@ -92,6 +92,28 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
     return null;
   };
 
+  const createSimpleCropList = (groupedCrops: Record<string, Record<string, CropRecommendation[]>>, location: ClimateData) => (
+    <div className="bg-white rounded-lg border border-green-200 p-4 space-y-4">
+      {Object.entries(groupedCrops).map(([type, crops]) => (
+        <div key={type}>
+          <h4 className="text-lg font-bold text-green-600 mb-3">{type}</h4>
+          {Object.entries(crops).map(([cropName, varieties]) => (
+            <div key={cropName} className="mb-3">
+              <h5 className="font-semibold text-gray-800 mb-2">{cropName}</h5>
+              <div className="flex flex-wrap gap-2 ml-4">
+                {varieties.map((rec, idx) => (
+                  <span key={idx} className="bg-gray-100 px-3 py-1 rounded-full text-gray-700 text-sm">
+                    {rec.crop.Variety}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+
   const createCropCard = (cropType: string, crops: Record<string, CropRecommendation[]>, location: ClimateData) => (
     <div key={cropType} className="bg-white rounded-lg border border-green-200 p-4 mb-3">
       <div className="space-y-3">
