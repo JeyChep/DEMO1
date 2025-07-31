@@ -93,42 +93,18 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
   };
 
   const createCropCard = (cropType: string, crops: Record<string, CropRecommendation[]>, location: ClimateData) => (
-    <div key={cropType} className="bg-white rounded-lg border border-green-200 p-4 mb-4 min-w-[320px]">
-      {/* Crop Name as Bold Green Header */}
-      <h3 className="text-xl font-bold text-green-600 mb-4 border-b border-green-200 pb-2">
-        {cropType}
-      </h3>
-      
-      {/* Varieties in Horizontal Layout */}
-      <div className="space-y-4">
+    <div key={cropType} className="bg-white rounded-lg border border-green-200 p-4 mb-3">
+      <div className="space-y-3">
         {Object.entries(crops).map(([cropName, varieties]) => (
           <div key={cropName}>
-            <h4 className="text-lg font-bold text-green-700 mb-3">{cropName}</h4>
-            <div className="flex flex-wrap gap-3">
+            <h4 className="text-lg font-bold text-green-600 mb-2">{cropName}</h4>
+            <ul className="list-disc list-inside space-y-1 ml-4">
               {varieties.map((rec, idx) => (
-                <div key={idx} className="bg-green-50 rounded-lg p-3 border border-green-200 hover:shadow-md transition-shadow cursor-pointer min-w-[140px]">
-                  <div className="text-center">
-                    <div className="font-medium text-gray-800 mb-2">{rec.crop.Variety}</div>
-                    <button 
-                      onClick={() => {
-                        // Create detailed card for this variety
-                        const detailCard = createDetailedCropCard(rec);
-                        setMessages(prev => [...prev, {
-                          id: Date.now().toString(),
-                          text: `📋 **Detailed Information for ${rec.crop.Variety}**`,
-                          isBot: true,
-                          timestamp: new Date(),
-                          cards: [detailCard]
-                        }]);
-                      }}
-                      className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 transition-colors"
-                    >
-                      Show Details
-                    </button>
-                  </div>
-                </div>
+                <li key={idx} className="text-gray-700 text-sm">
+                  {rec.crop.Variety}
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
         ))}
       </div>
