@@ -6,16 +6,22 @@ interface LocationSelectorProps {
   climateData: ClimateData[];
   selectedLocation: ClimateData | null;
   onLocationSelect: (location: ClimateData) => void;
+  selectedCounty: string;
+  selectedSubcounty: string;
+  onCountyChange: (county: string) => void;
+  onSubcountyChange: (subcounty: string) => void;
 }
 
 export const LocationSelector: React.FC<LocationSelectorProps> = ({
   climateData,
   selectedLocation,
-  onLocationSelect
+  onLocationSelect,
+  selectedCounty,
+  selectedSubcounty,
+  onCountyChange,
+  onSubcountyChange
 }) => {
   const counties = [...new Set(climateData.map(d => d.county))].sort();
-  const [selectedCounty, setSelectedCounty] = React.useState<string>('');
-  const [selectedSubcounty, setSelectedSubcounty] = React.useState<string>('');
   
   const subcounties = selectedCounty 
     ? [...new Set(climateData.filter(d => d.county === selectedCounty).map(d => d.subcounty))].sort()
@@ -26,12 +32,12 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
     : [];
 
   const handleCountyChange = (county: string) => {
-    setSelectedCounty(county);
-    setSelectedSubcounty('');
+    onCountyChange(county);
+    onSubcountyChange('');
   };
 
   const handleSubcountyChange = (subcounty: string) => {
-    setSelectedSubcounty(subcounty);
+    onSubcountyChange(subcounty);
   };
 
   const handleWardSelect = (ward: ClimateData) => {

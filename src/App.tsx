@@ -384,21 +384,27 @@ function App() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
+          {/* Climate Information - Show first when location is selected */}
+          {selectedLocation && activeTab !== 'suitability-map' && (
+            <ClimateInfo climate={selectedLocation} />
+          )}
+
           {/* Location Selection - Only show for non-map tabs */}
           {activeTab !== 'suitability-map' && (
             <LocationSelector
               climateData={climateData}
               selectedLocation={selectedLocation}
               onLocationSelect={setSelectedLocation}
+              selectedCounty={selectedCounty}
+              selectedSubcounty={selectedSubcounty}
+              onCountyChange={setSelectedCounty}
+              onSubcountyChange={setSelectedSubcounty}
             />
           )}
 
-          {/* Climate Information - Only show for non-map tabs */}
+          {/* Location Confirmation Button and Map */}
           {selectedLocation && activeTab !== 'suitability-map' && (
-            <div className="space-y-4">
-              <ClimateInfo climate={selectedLocation} />
-              
-              {/* Location Confirmation Button */}
+            <>
               <div className="flex justify-center">
                 <button
                   onClick={() => setShowLocationMap(!showLocationMap)}
@@ -416,7 +422,7 @@ function App() {
                   onClose={() => setShowLocationMap(false)}
                 />
               )}
-            </div>
+            </>
           )}
 
           {/* Tab Navigation */}
