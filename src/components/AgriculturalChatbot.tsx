@@ -95,14 +95,13 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
   const createSimpleCropList = (groupedCrops: Record<string, Record<string, CropRecommendation[]>>, location: ClimateData) => (
     <div className="bg-white rounded-lg border border-green-200 p-4 space-y-4">
       {Object.entries(groupedCrops).map(([type, crops]) => (
-        <div key={type} className="mb-4">
-          <h4 className="text-lg font-bold text-green-600 mb-2">{type}</h4>
+        <div key={type}>
           {Object.entries(crops).map(([cropName, varieties]) => (
-            <div key={cropName} className="mb-3">
-              <h5 className="font-semibold text-green-600 mb-2">{cropName}</h5>
-              <div className="flex flex-wrap gap-2">
+            <div key={cropName} className="mb-4">
+              <h4 className="text-lg font-bold text-green-600 mb-2">{cropName}</h4>
+              <div className="flex flex-wrap gap-2 mb-3">
                 {varieties.map((rec, idx) => (
-                  <span key={idx} className="bg-green-100 px-3 py-1 rounded-full text-green-700 text-sm font-medium">
+                  <span key={idx} className="bg-green-100 px-3 py-1 rounded-full text-green-800 text-sm font-medium">
                     {rec.crop.Variety}
                   </span>
                 ))}
