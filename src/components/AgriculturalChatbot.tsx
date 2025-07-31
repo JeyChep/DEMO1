@@ -93,13 +93,13 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
   };
 
   const createSimpleCropList = (groupedCrops: Record<string, Record<string, CropRecommendation[]>>, location: ClimateData) => (
-    <div className="bg-white rounded-lg border border-green-200 p-4 space-y-4">
-      {Object.entries(groupedCrops).map(([type, crops]) => (
-        <div key={type}>
-          {Object.entries(crops).map(([cropName, varieties]) => (
-            <div key={cropName} className="mb-4">
+    <div className="bg-white rounded-lg border border-green-200 p-4">
+      <div className="space-y-3">
+        {Object.entries(groupedCrops).map(([type, crops]) => 
+          Object.entries(crops).map(([cropName, varieties]) => (
+            <div key={cropName}>
               <h4 className="text-lg font-bold text-green-600 mb-2">{cropName}</h4>
-              <div className="flex flex-wrap gap-2 mb-3">
+              <div className="flex flex-wrap gap-2">
                 {varieties.map((rec, idx) => (
                   <span key={idx} className="bg-green-100 px-3 py-1 rounded-full text-green-800 text-sm font-medium">
                     {rec.crop.Variety}
@@ -107,9 +107,9 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
                 ))}
               </div>
             </div>
-          ))}
-        </div>
-      ))}
+          ))
+        ).flat()}
+      </div>
     </div>
   );
 
@@ -310,16 +310,10 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
 
       return {
         id: Date.now().toString(),
-        text: `🌾 **Crop Recommendations for ${location.ward} Ward**
-
-📍 **Location:** ${location.ward} Ward, ${location.subcounty} Sub County, ${location.county}
-🌡️ **Climate:** ${location.annual_Temp.toFixed(1)}°C, ${location.annual_Rain}mm rain
-⛰️ **Altitude:** ${location.altitude.toFixed(1)}m, Zone: ${aez.toUpperCase()}
-
-Found **${suitableCrops.length} suitable crop varieties** across **${Object.keys(groupedCrops).length} crop types**. Here are the detailed recommendations:`,
+        text: `🌾 Top Recommended Crops for ${location.ward} Ward:`,
         isBot: true,
         timestamp: new Date(),
-        cards
+        cards: [createSimpleCropList(groupedCrops, location)]
       };
     }
 
