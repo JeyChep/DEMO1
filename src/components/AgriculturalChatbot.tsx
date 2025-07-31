@@ -93,79 +93,39 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
   };
 
   const createCropCard = (cropType: string, crops: Record<string, CropRecommendation[]>, location: ClimateData) => (
-    <div key={cropType} className="bg-white rounded-lg border border-green-200 p-4 mb-3 min-w-[280px]">
-      <div className="flex items-center gap-2 mb-3">
-        <Leaf className="w-5 h-5 text-green-600" />
-        <h4 className="font-semibold text-gray-800">{cropType}</h4>
-      </div>
+    <div key={cropType} className="bg-white rounded-lg border border-green-200 p-4 mb-4 min-w-[320px]">
+      {/* Crop Name as Bold Green Header */}
+      <h3 className="text-xl font-bold text-green-600 mb-4 border-b border-green-200 pb-2">
+        {cropType}
+      </h3>
       
-      <div className="space-y-3">
+      {/* Varieties in Horizontal Layout */}
+      <div className="space-y-4">
         {Object.entries(crops).map(([cropName, varieties]) => (
-          <div key={cropName} className="border-l-2 border-green-200 pl-3">
-            <h5 className="font-medium text-gray-700 mb-2">{cropName}</h5>
-            <div className="space-y-2">
+          <div key={cropName}>
+            <h4 className="text-lg font-bold text-green-700 mb-3">{cropName}</h4>
+            <div className="flex flex-wrap gap-3">
               {varieties.map((rec, idx) => (
-                <div key={idx} className="bg-green-50 rounded p-3">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-medium text-gray-800">{rec.crop.Variety}</span>
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${
-                      rec.suitabilityScore >= 80 ? 'bg-green-100 text-green-700' :
-                      rec.suitabilityScore >= 60 ? 'bg-yellow-100 text-yellow-700' :
-                      'bg-red-100 text-red-700'
-                    }`}>
-                      {rec.suitabilityScore}% Suitable
-                    </span>
+                <div key={idx} className="bg-green-50 rounded-lg p-3 border border-green-200 hover:shadow-md transition-shadow cursor-pointer min-w-[140px]">
+                  <div className="text-center">
+                    <div className="font-medium text-gray-800 mb-2">{rec.crop.Variety}</div>
+                    <button 
+                      onClick={() => {
+                        // Create detailed card for this variety
+                        const detailCard = createDetailedCropCard(rec);
+                        setMessages(prev => [...prev, {
+                          id: Date.now().toString(),
+                          text: `📋 **Detailed Information for ${rec.crop.Variety}**`,
+                          isBot: true,
+                          timestamp: new Date(),
+                          cards: [detailCard]
+                        }]);
+                      }}
+                      className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 transition-colors"
+                    >
+                      Show Details
+                    </button>
                   </div>
-                  
-                  <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 mb-2">
-                    <div>🌡️ {rec.crop.minTemp}-{rec.crop.maxTemp}°C</div>
-                    <div>🌧️ {rec.crop.minPrep}-{rec.crop.maxPrep}mm</div>
-                    <div>⛰️ {rec.crop.minAlti}-{rec.crop.maxAlti}m</div>
-                    <div>🧪 pH {rec.crop.minpH}-{rec.crop.maxpH}</div>
-                  </div>
-
-                  {rec.crop.tex1 && (
-                    <div className="mb-2">
-                      <span className="text-xs text-gray-500">Soil types: </span>
-                      <span className="text-xs text-gray-700">
-                        {[rec.crop.tex1, rec.crop.tex2, rec.crop.tex3].filter(Boolean).join(', ')}
-                      </span>
-                    </div>
-                  )}
-
-                  <div className="flex flex-wrap gap-1 mb-2">
-                    {rec.crop.drought_tolerant === 1 && (
-                      <span className="px-2 py-1 bg-amber-100 text-amber-700 text-xs rounded">Drought Tolerant</span>
-                    )}
-                    {rec.crop.pest_tolerant === 1 && (
-                      <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded">Pest Resistant</span>
-                    )}
-                    {rec.crop.availability === 1 && (
-                      <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded">Seeds Available</span>
-                    )}
-                  </div>
-
-                  {rec.matchingFactors.length > 0 && (
-                    <div className="mb-2">
-                      <div className="text-xs font-medium text-green-700 mb-1">✓ Why it's suitable:</div>
-                      <ul className="text-xs text-green-600 space-y-1">
-                        {rec.matchingFactors.slice(0, 3).map((factor, i) => (
-                          <li key={i}>• {factor}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {rec.warnings.length > 0 && (
-                    <div>
-                      <div className="text-xs font-medium text-amber-700 mb-1">⚠️ Considerations:</div>
-                      <ul className="text-xs text-amber-600 space-y-1">
-                        {rec.warnings.slice(0, 2).map((warning, i) => (
-                          <li key={i}>• {warning}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
                 </div>
               ))}
             </div>
@@ -175,6 +135,69 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
     </div>
   );
 
+  const createDetailedCropCard = (rec: CropRecommendation) => (
+    <div className="bg-white rounded-lg border border-green-200 p-4 max-w-md">
+      <div className="flex items-center justify-between mb-4">
+        <h4 className="text-lg font-bold text-gray-800">{rec.crop.Variety}</h4>
+        <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+          rec.suitabilityScore >= 80 ? 'bg-green-100 text-green-700' :
+          rec.suitabilityScore >= 60 ? 'bg-yellow-100 text-yellow-700' :
+          'bg-red-100 text-red-700'
+        }`}>
+          {rec.suitabilityScore}% Suitable
+        </span>
+      </div>
+      
+      <div className="space-y-3">
+        <div className="grid grid-cols-2 gap-3 text-sm">
+          <div>🌡️ <strong>Temperature:</strong> {rec.crop.minTemp}-{rec.crop.maxTemp}°C</div>
+          <div>🌧️ <strong>Rainfall:</strong> {rec.crop.minPrep}-{rec.crop.maxPrep}mm</div>
+          <div>⛰️ <strong>Altitude:</strong> {rec.crop.minAlti}-{rec.crop.maxAlti}m</div>
+          <div>🧪 <strong>pH:</strong> {rec.crop.minpH}-{rec.crop.maxpH}</div>
+        </div>
+
+        {rec.crop.tex1 && (
+          <div className="text-sm">
+            <strong>Soil types:</strong> {[rec.crop.tex1, rec.crop.tex2, rec.crop.tex3].filter(Boolean).join(', ')}
+          </div>
+        )}
+
+        <div className="flex flex-wrap gap-2">
+          {rec.crop.drought_tolerant === 1 && (
+            <span className="px-2 py-1 bg-amber-100 text-amber-700 text-xs rounded-full">🌵 Drought Tolerant</span>
+          )}
+          {rec.crop.pest_tolerant === 1 && (
+            <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">🛡️ Pest Resistant</span>
+          )}
+          {rec.crop.availability === 1 && (
+            <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">✅ Seeds Available</span>
+          )}
+        </div>
+
+        {rec.matchingFactors.length > 0 && (
+          <div className="bg-green-50 rounded p-3">
+            <div className="text-sm font-medium text-green-700 mb-2">✅ Why it's suitable for your area:</div>
+            <ul className="text-sm text-green-600 space-y-1">
+              {rec.matchingFactors.map((factor, i) => (
+                <li key={i}>• {factor}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {rec.warnings.length > 0 && (
+          <div className="bg-amber-50 rounded p-3">
+            <div className="text-sm font-medium text-amber-700 mb-2">⚠️ Things to consider:</div>
+            <ul className="text-sm text-amber-600 space-y-1">
+              {rec.warnings.map((warning, i) => (
+                <li key={i}>• {warning}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </div>
+  );
   const createLivestockCard = (livestockType: string, livestock: any[], location: ClimateData) => (
     <div key={livestockType} className="bg-white rounded-lg border border-blue-200 p-4 mb-3 min-w-[280px]">
       <div className="flex items-center gap-2 mb-3">
