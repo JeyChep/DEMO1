@@ -312,11 +312,14 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
         id: Date.now().toString(),
         text: `🌾 **Top Recommended Crops for ${location.ward} Ward:**
 
-${Object.entries(groupedCrops).map(([cropName, varieties]) => 
-  `**${cropName}**\n${varieties.map(rec => `• ${rec.crop.Variety}`).join('  ')}`
-).join('\n\n')}`,
+${Object.entries(groupedCrops).map(([type, crops]) => 
+  Object.entries(crops).map(([cropName, varieties]) => 
+    `**${cropName}**\n${varieties.map(rec => `• ${rec.crop.Variety}`).join('  •  ')}`
+  ).join('\n\n')
+).flat().join('\n\n')}`,
         isBot: true,
-        timestamp: new Date()
+        timestamp: new Date(),
+        cards: undefined
       };
     }
 
