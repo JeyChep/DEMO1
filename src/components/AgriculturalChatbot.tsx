@@ -313,7 +313,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
       response += `• Contact extension officer for guidance\n`;
       
     } else {
-      response += `❌ <span style="color: #16a34a; font-weight: bold;">Limited ${cropType} options for ${location.ward}</span>\n\n`;
+      response += `❌ <span style="color: #16a34a; font-weight: bold;">No suitable ${cropType} crops found for ${location.ward}</span>\n\n`;
       response += `<span style="color: #16a34a; font-weight: bold;">Suggestions:</span>\n`;
       response += `• Try other crop types better suited to your area\n`;
       response += `• Improve soil conditions with organic matter\n`;
@@ -478,9 +478,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
     let response = `🌱 <span style="color: #16a34a; font-weight: bold;">Best Crops for ${location.ward} Ward</span>\n\n`;
     
     // Location info
-    response += `📍 <span style="color: #16a34a; font-weight: bold;">Location:</span> ${location.ward}, ${location.subcounty}, ${location.county}\n`;
-    response += `🌡️ <span style="color: #16a34a; font-weight: bold;">Climate:</span> ${location.annual_Temp}°C, ${location.annual_Rain}mm rain\n`;
-    response += `⛰️ <span style="color: #16a34a; font-weight: bold;">Altitude:</span> ${location.altitude}m, Zone: ${aez.toUpperCase()}\n\n`;
+    response += `📍 <span style="color: #16a34a; font-weight: bold;">Location:</span> ${location.ward}, ${location.subcounty}, ${location.county}\n\n`;
     
     if (finalRecs.length > 0) {
       response += `🏆 <span style="color: #16a34a; font-weight: bold;">Top Recommended Crops:</span>\n\n`;
@@ -517,7 +515,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
       response += `• Contact extension officer for guidance\n`;
       
     } else {
-      response += `❌ <span style="color: #16a34a; font-weight: bold;">Limited options for ${location.ward}</span>\n\n`;
+      response += `❌ <span style="color: #16a34a; font-weight: bold;">No suitable crops found for ${location.ward}</span>\n\n`;
       response += `<span style="color: #16a34a; font-weight: bold;">Suggestions:</span>\n`;
       response += `• Try drought-resistant crops (sorghum, millet)\n`;
       response += `• Improve soil with organic matter\n`;
