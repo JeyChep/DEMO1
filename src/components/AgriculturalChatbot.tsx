@@ -260,26 +260,14 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
     const recommendations = getTopCropRecommendations(filteredCrops, location, 20);
     
     // Try different suitability thresholds to ensure we find crops
-    let finalRecs = recommendations.filter(rec => rec.suitabilityScore >= 40);
-    if (finalRecs.length === 0) {
-      finalRecs = recommendations.filter(rec => rec.suitabilityScore >= 20);
+    let filteredRecs = recommendations.filter(rec => rec.suitabilityScore >= 40);
+    if (filteredRecs.length === 0) {
+      filteredRecs = recommendations.filter(rec => rec.suitabilityScore >= 20);
     }
-    if (finalRecs.length === 0) {
-      finalRecs = recommendations.slice(0, 8); // Show top 8 regardless of score
+    if (filteredRecs.length === 0) {
+      filteredRecs = recommendations.slice(0, 8); // Show top 8 regardless of score
     }
-    let finalRecs = recommendations.filter(rec => rec.suitabilityScore >= 40);
-    if (finalRecs.length === 0) {
-      finalRecs = recommendations.filter(rec => rec.suitabilityScore >= 20);
-    }
-    if (finalRecs.length === 0) {
-      finalRecs = recommendations.slice(0, 8); // Show top crops regardless of score
-    }
-    if (finalRecs.length === 0) {
-      finalRecs = recommendations.filter(rec => rec.suitabilityScore >= 20);
-    }
-    if (finalRecs.length === 0) {
-      finalRecs = recommendations.slice(0, 8); // Show top 8 even if low scores
-    }
+    const finalRecs = filteredRecs;
     
     let response = `🌱 <span style="color: #16a34a; font-weight: bold;">${cropType} Crops for ${location.ward} Ward</span>\n\n`;
     
@@ -497,7 +485,8 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
     
     // Location info
     response += `📍 <span style="color: #16a34a; font-weight: bold;">Location:</span> ${location.ward}, ${location.subcounty}, ${location.county}\n\n`;
-    response += `\n`;
+    
+    if (finalRecs.length > 0) {
       response += `🏆 <span style="color: #16a34a; font-weight: bold;">Top Recommended Crops:</span>\n\n`;
       
       // Group by crop name for better structure
@@ -704,6 +693,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
       response += `❌ <span style="color: #16a34a; font-weight: bold;">No specific matches for ${location.ward}</span>\n\n`;
       response += `<span style="color: #16a34a; font-weight: bold;">Try these options:</span>\n`;
       response += `• Contact ${location.county} agricultural office\n`;
+      response += `• Consider other pasture types suitable for your area\n`;
       response += `• Visit KALRO research stations\n`;
     }
 
