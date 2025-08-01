@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, Send, X, Minimize2, Maximize2, Sprout, MapPin, Lightbulb } from 'lucide-react';
 import { CropData, ClimateData, LivestockData, PastureData, AEZData } from '../types';
 import { getTopCropRecommendations } from '../utils/cropMatcher';
+import { getLivestockRecommendations, getPastureRecommendations } from '../utils/aezMatcher';
 
 interface Message {
   id: string;
@@ -184,8 +185,85 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
     const locationMatch = findLocationByName(message);
     
     if (locationMatch) {
-      // Check for specific crop type requests
-      if (lowerMessage.includes('cereal')) {
+      // Check what type of recommendation is requested
+      if (lowerMessage.includes('livestock') || lowerMessage.includes('cattle') || lowerMessage.includes('goat') || lowerMessage.includes('sheep') || lowerMessage.includes('chicken') || lowerMessage.includes('poultry')) {
+        // LIVESTOCK RECOMMENDATIONS
+        const livestockRecs = getLivestockRecommendations(livestockData, locationMatch, aezData);
+        
+        response = `🐄 Livestock Recommendations for ${locationMatch.ward} Ward\n\n`;
+        response += `📍 Location: ${locationMatch.ward} Ward, ${locationMatch.subcounty} Sub County, ${locationMatch.county}\n\n`;
+        
+        if (livestockRecs.length > 0) {
+          const groupedLivestock: { [key: string]: string[] } = {};
+          
+          livestockRecs.forEach(rec => {
+            const type = rec.livestock.Livestock;
+            if (!groupedLivestock[type]) {
+              groupedLivestock[type] = [];
+            }
+            groupedLivestock[type].push(rec.livestock.Breed);
+          });
+          
+          Object.entries(groupedLivestock).forEach(([type, breeds]) => {
+            response += `**${type}**\n`;
+            breeds.forEach(breed => {
+              response += `• ${breed}\n`;
+            });
+            response += '\n';
+          });
+          
+          response += `💡 **Success Tips for ${locationMatch.ward} Ward:**\n`;
+          response += `• **AEZ Match:** These breeds are suitable for your agro-ecological zone\n`;
+          response += `• Visit local livestock extension officer for guidance\n`;
+          response += `• Consider local market demand\n`;
+          response += `• Ensure proper housing and feeding`;
+        } else {
+          response += `❌ No livestock breeds available for your AEZ\n\n`;
+          response += `**Suggestions:**\n`;
+          response += `• Contact KALRO ${locationMatch.county} office for alternatives\n`;
+          response += `• Consider improving local conditions\n`;
+          response += `• Look into emerging livestock options`;
+        }
+      } else if (lowerMessage.includes('pasture') || lowerMessage.includes('fodder') || lowerMessage.includes('grass') || lowerMessage.includes('feed')) {
+        // PASTURE RECOMMENDATIONS
+        const pastureRecs = getPastureRecommendations(pastureData, locationMatch, aezData);
+        
+        response = `🌾 Pasture & Fodder Recommendations for ${locationMatch.ward} Ward\n\n`;
+        response += `📍 Location: ${locationMatch.ward} Ward, ${locationMatch.subcounty} Sub County, ${locationMatch.county}\n\n`;
+        
+        if (pastureRecs.length > 0) {
+          const groupedPasture: { [key: string]: string[] } = {};
+          
+          pastureRecs.forEach(rec => {
+            const type = rec.pasture['Pasture/fodder'];
+            if (!groupedPasture[type]) {
+              groupedPasture[type] = [];
+            }
+            groupedPasture[type].push(rec.pasture.Variety);
+          });
+          
+          Object.entries(groupedPasture).forEach(([type, varieties]) => {
+            response += `**${type}**\n`;
+            varieties.forEach(variety => {
+              response += `• ${variety}\n`;
+            });
+            response += '\n';
+          });
+          
+          response += `💡 **Success Tips for ${locationMatch.ward} Ward:**\n`;
+          response += `• **AEZ Match:** These varieties are suitable for your agro-ecological zone\n`;
+          response += `• Consider mixed pasture systems\n`;
+          response += `• Plan for seasonal variations\n`;
+          response += `• Ensure proper grazing management`;
+        } else {
+          response += `❌ No pasture varieties available for your AEZ\n\n`;
+          response += `**Suggestions:**\n`;
+          response += `• Contact KALRO ${locationMatch.county} office for alternatives\n`;
+          response += `• Consider improving soil conditions\n`;
+          response += `• Look into drought-resistant varieties`;
+        }
+      } else if (lowerMessage.includes('cereal')) {
+        // SPECIFIC CEREAL CROPS
         const cerealCrops = getCropsByType(cropsData, 'Cereal');
         const cerealRecs = generateCropRecommendations(locationMatch, 'Cereal');
         
@@ -225,6 +303,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
           response += `• Contact KALRO ${locationMatch.county} office for alternatives`;
         }
       } else if (lowerMessage.includes('legume')) {
+        // SPECIFIC LEGUME CROPS
         const legumeCrops = getCropsByType(cropsData, 'Legume');
         const legumeRecs = generateCropRecommendations(locationMatch, 'Legume');
         
@@ -264,6 +343,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
           response += `• Contact KALRO ${locationMatch.county} office for alternatives`;
         }
       } else if (lowerMessage.includes('vegetable')) {
+        // SPECIFIC VEGETABLE CROPS
         const vegetableCrops = getCropsByType(cropsData, 'Vegetable');
         const vegetableRecs = generateCropRecommendations(locationMatch, 'Vegetable');
         
@@ -303,7 +383,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
           response += `• Contact KALRO ${locationMatch.county} office for alternatives`;
         }
       } else {
-        // General crop recommendations with cards
+        // GENERAL CROP RECOMMENDATIONS WITH CLICKABLE CARDS
         const recommendations = generateCropRecommendations(locationMatch);
         
         response = `🌾 Best Crops for ${locationMatch.ward} Ward\n\n`;
@@ -337,7 +417,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
           response += `• Contact extension officer for guidance\n`;
           response += `• Consider soil testing before planting`;
           
-          // Create cards for different crop types
+          // Create clickable cards for different crop types
           const cropTypes = ['Cereal', 'Legume', 'Vegetable', 'Root', 'Fruit'];
           cropTypes.forEach(type => {
             const typeCrops = getCropsByType(cropsData, type);
@@ -357,10 +437,16 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
       // No location found
       response = `I'd be happy to help you find the best crops for your area! 🌱\n\n`;
       response += `Please specify a location in Kenya, such as:\n`;
-      response += `• "What crops can I grow in Kandara ward?"\n`;
-      response += `• "Show me cereals for Nairobi"\n`;
-      response += `• "Best vegetables for Meru county"\n\n`;
-      response += `I have data for ${climateData.length} locations across Kenya and ${cropsData.length} crop varieties to help you make the best choice! 🚜`;
+      response += `• **Crops:** "What crops can I grow in Kandara ward?"\n`;
+      response += `• **Livestock:** "Show me livestock for Nairobi"\n`;
+      response += `• **Pasture:** "Best pasture for Meru county"\n`;
+      response += `• **Specific:** "Show me cereals for Kisumu"\n\n`;
+      response += `I have data for:\n`;
+      response += `• ${climateData.length} locations across Kenya\n`;
+      response += `• ${cropsData.length} crop varieties\n`;
+      response += `• ${livestockData.length} livestock breeds\n`;
+      response += `• ${pastureData.length} pasture varieties\n\n`;
+      response += `Just ask me about any location! 🚜`;
     }
     
     setIsTyping(false);
