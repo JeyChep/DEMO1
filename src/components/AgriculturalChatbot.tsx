@@ -377,57 +377,16 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
           response += `• Improve soil conditions with organic matter\n`;
           response += `• Contact KALRO ${locationMatch.county} office for alternatives`;
         }
-      } else {
-        // GENERAL CROP RECOMMENDATIONS WITH CLICKABLE CARDS
-        const recommendations = getTopCropRecommendations(cropsData, locationMatch, 100);
-        let filteredRecs = recommendations.filter(rec => rec.suitabilityScore >= 60);
+        response += `Click on a crop type below to see all available varieties:\n\n`;
         
-        if (filteredRecs.length === 0 && recommendations.length > 0) {
-          filteredRecs = recommendations.slice(0, 20);
-        }
-        if (recommendations.length > 0) {
-          response += `🏆 **Top Recommended Crops (${filteredRecs.length} varieties):**\n\n`;
-          
-          const groupedCrops: { [key: string]: string[] } = {};
-          
-          filteredRecs.slice(0, 15).forEach(rec => {
-            const cropName = rec.crop.Crop;
-            if (!groupedCrops[cropName]) {
-              groupedCrops[cropName] = [];
-            }
-            groupedCrops[cropName].push(rec.crop.Variety);
-          });
-          
-          Object.entries(groupedCrops).forEach(([cropName, varieties]) => {
-            response += `**${cropName}**\n`;
-            varieties.forEach(variety => {
-              response += `• ${variety}\n`;
-            });
-            response += '\n';
-          });
-          
-          const topCrop = recommendations[0];
-          response += `💡 **Success Tips for ${locationMatch.ward} Ward:**\n`;
-          response += `• **Top choice:** ${topCrop.crop.Crop} - ${topCrop.crop.Variety}\n`;
-          response += `• Visit local agro-dealer for quality seeds\n`;
-          response += `• Contact extension officer for guidance\n`;
-          response += `• Consider soil testing before planting`;
-          
-          // Create clickable cards for different crop types
-          const cropTypes = ['cereal', 'legume', 'vegetable', 'root', 'fruit', 'cash', 'spice', 'oil'];
-          cropTypes.forEach(type => {
-            const typeCrops = recommendations.filter(rec => rec.crop.Type.toLowerCase() === type);
-            if (typeCrops.length > 0) {
-              cards.push(createCropCard(`${type.charAt(0).toUpperCase() + type.slice(1)} Crops`, locationMatch, typeCrops, type));
-            }
-          });
-        } else {
-          response += `❌ No suitable crops found for ${locationMatch.ward} Ward\n\n`;
-          response += `**Suggestions:**\n`;
-          response += `• Try improving soil conditions with organic matter\n`;
-          response += `• Contact KALRO ${locationMatch.county} office for alternatives\n`;
-          response += `• Consider greenhouse farming for better control`;
-        }
+        // Create clickable cards for different crop types
+        const cropTypes = ['Cereal', 'Legume', 'Vegetable', 'Root', 'Fruit', 'Cash', 'Spice', 'Oil'];
+        cropTypes.forEach(type => {
+          const typeCrops = cropsData.filter(crop => crop.Type.toLowerCase() === type.toLowerCase());
+          if (typeCrops.length > 0) {
+            cards.push(createCropCard(`${type} Crops`, locationMatch, typeCrops, type.toLowerCase()));
+          }
+        });
       }
     } else {
       // No location found
