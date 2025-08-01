@@ -258,8 +258,15 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
     // Filter crops by specific type
     const filteredCrops = cropsData.filter(crop => crop.Type === cropType);
     const recommendations = getTopCropRecommendations(filteredCrops, location, 20);
-    // Lower the threshold to find more crops - try 40% first, then 20%, then show top 8
+    
+    // Try different suitability thresholds to find crops
     let finalRecs = recommendations.filter(rec => rec.suitabilityScore >= 40);
+    if (finalRecs.length === 0) {
+      finalRecs = recommendations.filter(rec => rec.suitabilityScore >= 20);
+    }
+    if (finalRecs.length === 0) {
+      finalRecs = recommendations.slice(0, 8); // Show top crops regardless of score
+    }
     if (finalRecs.length === 0) {
       finalRecs = recommendations.filter(rec => rec.suitabilityScore >= 20);
     }
@@ -267,14 +274,10 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
       finalRecs = recommendations.slice(0, 8); // Show top 8 even if low scores
     }
     
-    const aez = determineAEZ(location, aezData);
-    
     let response = `🌱 <span style="color: #16a34a; font-weight: bold;">${cropType} Crops for ${location.ward} Ward</span>\n\n`;
     
     // Location info
     response += `📍 <span style="color: #16a34a; font-weight: bold;">Location:</span> ${location.ward}, ${location.subcounty}, ${location.county}\n`;
-    response += `🌡️ <span style="color: #16a34a; font-weight: bold;">Climate:</span> ${location.annual_Temp}°C, ${location.annual_Rain}mm rain\n`;
-    response += `⛰️ <span style="color: #16a34a; font-weight: bold;">Altitude:</span> ${location.altitude}m, Zone: ${aez.toUpperCase()}\n\n`;
     
     if (finalRecs.length > 0) {
       response += `🏆 <span style="color: #16a34a; font-weight: bold;">Best ${cropType} Options:</span>\n\n`;
