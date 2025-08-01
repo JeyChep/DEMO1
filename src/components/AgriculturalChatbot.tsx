@@ -357,7 +357,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
           });
           
           Object.entries(groupedCrops).forEach(([cropName, varieties]) => {
-            response += `**${cropName}**\n`;
+            response += `${cropName}\n`;
             varieties.forEach(variety => {
               response += `• ${variety}\n`;
             });
@@ -365,14 +365,14 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
           });
           
           const topCrop = vegetableRecs[0];
-          response += `💡 **Success Tips for ${locationMatch.ward} Ward:**\n`;
-          response += `• **Top choice:** ${topCrop.crop.Crop} - ${topCrop.crop.Variety}\n`;
+          response += `💡 Success Tips for ${locationMatch.ward} Ward:\n`;
+          response += `• Top choice: ${topCrop.crop.Crop} - ${topCrop.crop.Variety}\n`;
           response += `• Visit local agro-dealer for quality seeds\n`;
           response += `• Contact extension officer for guidance\n`;
           response += `• Consider soil testing before planting`;
         } else {
           response += `❌ No Vegetable crops available in our database\n\n`;
-          response += `**Suggestions:**\n`;
+          response += `Suggestions:\n`;
           response += `• Try other crop types better suited to your area\n`;
           response += `• Improve soil conditions with organic matter\n`;
           response += `• Contact KALRO ${locationMatch.county} office for alternatives`;
