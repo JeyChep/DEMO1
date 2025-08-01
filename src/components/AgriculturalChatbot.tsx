@@ -53,49 +53,97 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
   const findLocationByName = (locationName: string): ClimateData | null => {
     const searchTerm = locationName.toLowerCase().trim();
     
-    // Extract potential location words from the message
-    const words = searchTerm.split(/\s+/);
+    // Extract potential location words from the message (split by spaces, commas, etc.)
+    const words = searchTerm.split(/[\s,.-]+/).filter(word => word.length > 1);
     
-    // Try to find location by checking each word and combination
+    console.log('Searching for location in:', searchTerm);
+    console.log('Search words:', words);
+    
+    // Priority 1: Exact matches (highest priority)
     for (const location of climateData) {
       const ward = location.ward.toLowerCase();
       const subcounty = location.subcounty.toLowerCase();
       const county = location.county.toLowerCase();
       
-      // Check exact matches first
+      // Exact full matches
       if (ward === searchTerm || subcounty === searchTerm || county === searchTerm) {
+        console.log('Found exact match:', location.ward, location.subcounty, location.county);
         return location;
       }
+    }
+    
+    // Priority 2: Exact word matches
+    for (const location of climateData) {
+      const ward = location.ward.toLowerCase();
+      const subcounty = location.subcounty.toLowerCase();
+      const county = location.county.toLowerCase();
       
-      // Check if any word matches ward, subcounty, or county
       for (const word of words) {
-        if (word.length > 2) { // Ignore very short words
-          if (ward === word || subcounty === word || county === word) {
-            return location;
-          }
+        if (ward === word || subcounty === word || county === word) {
+          console.log('Found word match:', word, '→', location.ward, location.subcounty, location.county);
+          return location;
         }
       }
+    }
+    
+    // Priority 3: Partial matches (contains)
+    for (const location of climateData) {
+      const ward = location.ward.toLowerCase();
+      const subcounty = location.subcounty.toLowerCase();
+      const county = location.county.toLowerCase();
       
-      // Check partial matches
       if (ward.includes(searchTerm) || subcounty.includes(searchTerm) || county.includes(searchTerm)) {
+        console.log('Found partial match:', searchTerm, '→', location.ward, location.subcounty, location.county);
         return location;
       }
+    }
+    
+    // Priority 4: Search term contains location name
+    for (const location of climateData) {
+      const ward = location.ward.toLowerCase();
+      const subcounty = location.subcounty.toLowerCase();
+      const county = location.county.toLowerCase();
       
-      // Check if search term contains location names
       if (searchTerm.includes(ward) || searchTerm.includes(subcounty) || searchTerm.includes(county)) {
+        console.log('Found reverse match:', location.ward, location.subcounty, location.county);
         return location;
       }
+    }
+    
+    // Priority 5: Word-level partial matches
+    for (const location of climateData) {
+      const ward = location.ward.toLowerCase();
+      const subcounty = location.subcounty.toLowerCase();
+      const county = location.county.toLowerCase();
       
-      // Check individual words for partial matches
       for (const word of words) {
-        if (word.length > 2) {
+        if (word.length > 2) { // Only check meaningful words
           if (ward.includes(word) || subcounty.includes(word) || county.includes(word)) {
+            console.log('Found word partial match:', word, '→', location.ward, location.subcounty, location.county);
             return location;
           }
         }
       }
     }
     
+    // Priority 6: Fuzzy matching for common misspellings/variations
+    for (const location of climateData) {
+      const ward = location.ward.toLowerCase();
+      const subcounty = location.subcounty.toLowerCase();
+      const county = location.county.toLowerCase();
+      
+      // Check if any word is very similar (simple edit distance)
+      for (const word of words) {
+        if (word.length > 3) {
+          if (isSimular(word, ward) || isSimular(word, subcounty) || isSimular(word, county)) {
+            console.log('Found fuzzy match:', word, '→', location.ward, location.subcounty, location.county);
+            return location;
+          }
+        }
+      }
+    }
+    
+    console.log('No location found for:', searchTerm);
     return null;
   };
 
@@ -186,6 +234,25 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
         <p className="text-xs text-green-600 mt-1">Click to see details</p>
       </div>
     );
+  };
+
+  // Simple similarity check for fuzzy matching
+  const isSimular = (word1: string, word2: string): boolean => {
+    if (Math.abs(word1.length - word2.length) > 2) return false;
+    
+    // Check if one contains most of the other
+    const longer = word1.length > word2.length ? word1 : word2;
+    const shorter = word1.length <= word2.length ? word1 : word2;
+    
+    if (longer.includes(shorter) && shorter.length > 3) return true;
+    
+    // Simple character overlap check
+    let matches = 0;
+    for (let i = 0; i < shorter.length; i++) {
+      if (longer.includes(shorter[i])) matches++;
+    }
+    
+    return matches / shorter.length > 0.7; // 70% character overlap
   };
 
   const processMessage = async (message: string) => {
@@ -414,18 +481,18 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
       }
     } else {
       // No location found
-      response = `I'd be happy to help you find the best crops for your area! 🌱\n\n`;
-      response += `Please specify a location in Kenya, such as:\n`;
-      response += `• **Crops:** "What crops can I grow in Kandara ward?"\n`;
-      response += `• **Livestock:** "Show me livestock for Nairobi"\n`;
-      response += `• **Pasture:** "Best pasture for Meru county"\n`;
-      response += `• **Specific:** "Show me cereals for Kisumu"\n\n`;
-      response += `I have data for:\n`;
-      response += `• ${climateData.length} locations across Kenya\n`;
-      response += `• ${cropsData.length} crop varieties\n`;
-      response += `• ${livestockData.length} livestock breeds\n`;
-      response += `• ${pastureData.length} pasture varieties\n\n`;
-      response += `Just ask me about any location! 🚜`;
+      response = `I couldn't find that location in our database. 📍\n\n`;
+      response += `I have data for ${climateData.length} wards across Kenya.\n\n`;
+      response += `Please try:\n`;
+      response += `• Full ward name: "What crops can I grow in Kandara ward?"\n`;
+      response += `• County name: "Show me crops for Murang'a county"\n`;
+      response += `• Subcounty name: "Best crops for Kandara subcounty"\n\n`;
+      response += `Examples that work:\n`;
+      response += `• "crops in Nairobi"\n`;
+      response += `• "livestock for Meru"\n`;
+      response += `• "pasture in Kisumu"\n`;
+      response += `• "cereals for Nakuru"\n\n`;
+      response += `Try a different spelling or a nearby location! 🌾`;
     }
     
     setIsTyping(false);
