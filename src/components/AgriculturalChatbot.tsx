@@ -257,9 +257,15 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
     
     // Filter crops by specific type
     const filteredCrops = cropsData.filter(crop => crop.Type === cropType);
-    const recommendations = getTopCropRecommendations(filteredCrops, location, 10);
-    const filteredRecs = recommendations.filter(rec => rec.suitabilityScore >= 60);
-    const finalRecs = filteredRecs.length > 0 ? filteredRecs : recommendations.slice(0, 6);
+    const recommendations = getTopCropRecommendations(filteredCrops, location, 20);
+    // Lower the threshold to find more crops - try 40% first, then 20%, then show top 8
+    let finalRecs = recommendations.filter(rec => rec.suitabilityScore >= 40);
+    if (finalRecs.length === 0) {
+      finalRecs = recommendations.filter(rec => rec.suitabilityScore >= 20);
+    }
+    if (finalRecs.length === 0) {
+      finalRecs = recommendations.slice(0, 8); // Show top 8 even if low scores
+    }
     
     const aez = determineAEZ(location, aezData);
     
@@ -313,7 +319,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
       response += `• Contact extension officer for guidance\n`;
       
     } else {
-      response += `❌ <span style="color: #16a34a; font-weight: bold;">No suitable ${cropType} crops found for ${location.ward}</span>\n\n`;
+      response += `❌ <span style="color: #16a34a; font-weight: bold;">No ${cropType} crops available in our database</span>\n\n`;
       response += `<span style="color: #16a34a; font-weight: bold;">Suggestions:</span>\n`;
       response += `• Try other crop types better suited to your area\n`;
       response += `• Improve soil conditions with organic matter\n`;
@@ -469,9 +475,15 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
   const generateCropResponse = (location: ClimateData): Message => {
     console.log(`🌱 Generating crop recommendations for: ${location.ward}, ${location.subcounty}, ${location.county}`);
     
-    const recommendations = getTopCropRecommendations(cropsData, location, 15);
-    const filteredRecs = recommendations.filter(rec => rec.suitabilityScore >= 60);
-    const finalRecs = filteredRecs.length > 0 ? filteredRecs : recommendations.slice(0, 8);
+    const recommendations = getTopCropRecommendations(cropsData, location, 25);
+    // Lower the threshold to find more crops
+    let finalRecs = recommendations.filter(rec => rec.suitabilityScore >= 40);
+    if (finalRecs.length === 0) {
+      finalRecs = recommendations.filter(rec => rec.suitabilityScore >= 20);
+    }
+    if (finalRecs.length === 0) {
+      finalRecs = recommendations.slice(0, 10); // Show top 10 even if low scores
+    }
     
     const aez = determineAEZ(location, aezData);
     
@@ -505,17 +517,11 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
       const bestCrop = finalRecs[0];
       response += `• <span style="color: #16a34a; font-weight: bold;">Top choice:</span> ${bestCrop.crop.Crop} - ${bestCrop.crop.Variety}\n`;
       
-      if (location.annual_Rain > 1000) {
-        response += `• <span style="color: #16a34a; font-weight: bold;">Advantage:</span> Good rainfall for most crops\n`;
-      } else if (location.annual_Rain < 600) {
-        response += `• <span style="color: #16a34a; font-weight: bold;">Strategy:</span> Focus on drought-resistant varieties\n`;
-      }
-      
       response += `• Visit local agro-dealer for quality seeds\n`;
       response += `• Contact extension officer for guidance\n`;
       
     } else {
-      response += `❌ <span style="color: #16a34a; font-weight: bold;">No suitable crops found for ${location.ward}</span>\n\n`;
+      response += `❌ <span style="color: #16a34a; font-weight: bold;">No crops available in our database for ${location.ward}</span>\n\n`;
       response += `<span style="color: #16a34a; font-weight: bold;">Suggestions:</span>\n`;
       response += `• Try drought-resistant crops (sorghum, millet)\n`;
       response += `• Improve soil with organic matter\n`;
