@@ -3,6 +3,7 @@ import { MessageCircle, Send, X, Minimize2, Maximize2, Sprout, MapPin, Lightbulb
 import { CropData, ClimateData, LivestockData, PastureData, AEZData } from '../types';
 import { getTopCropRecommendations } from '../utils/cropMatcher';
 import { getLivestockRecommendations, getPastureRecommendations } from '../utils/aezMatcher';
+import { enhanceRecommendationsWithEconomics } from '../utils/costBenefitAnalysis';
 
 interface Message {
   id: string;
@@ -79,28 +80,21 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
   };
 
   const generateCropRecommendations = (location: ClimateData, cropType?: string) => {
-    let targetCrops = cropsData;
+    // Use the exact same logic as the main app
+    const recommendations = getTopCropRecommendations(cropsData, location, 100);
+    let filteredRecs = recommendations.filter(rec => rec.suitabilityScore >= 60);
     
-    if (cropType) {
-      targetCrops = getCropsByType(cropsData, cropType);
+    if (filteredRecs.length === 0 && recommendations.length > 0) {
+      filteredRecs = recommendations.slice(0, 10);
     }
     
-    if (targetCrops.length === 0) {
-      return [];
+    // Filter by crop type if specified
+    if (cropType) {
+      filteredRecs = filteredRecs.filter(rec => rec.crop.Type.toLowerCase() === cropType.toLowerCase());
     }
     
     const recommendations = getTopCropRecommendations(targetCrops, location, 50);
-    
-    // Try different suitability thresholds
-    let filteredRecs = recommendations.filter(rec => rec.suitabilityScore >= 40);
-    if (filteredRecs.length === 0) {
-      filteredRecs = recommendations.filter(rec => rec.suitabilityScore >= 20);
-    }
-    if (filteredRecs.length === 0) {
-      filteredRecs = recommendations.slice(0, 8);
-    }
-    
-    return filteredRecs.slice(0, 10);
+    return filteredRecs;
   };
 
   const createCropCard = (title: string, location: ClimateData, crops: any[], cropType?: string) => {
@@ -188,6 +182,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
       // Check what type of recommendation is requested
       if (lowerMessage.includes('livestock') || lowerMessage.includes('cattle') || lowerMessage.includes('goat') || lowerMessage.includes('sheep') || lowerMessage.includes('chicken') || lowerMessage.includes('poultry')) {
         // LIVESTOCK RECOMMENDATIONS
+        // Use the exact same logic as the livestock tab
         const livestockRecs = getLivestockRecommendations(livestockData, locationMatch, aezData);
         
         response = `🐄 Livestock Recommendations for ${locationMatch.ward} Ward\n\n`;
@@ -226,6 +221,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
         }
       } else if (lowerMessage.includes('pasture') || lowerMessage.includes('fodder') || lowerMessage.includes('grass') || lowerMessage.includes('feed')) {
         // PASTURE RECOMMENDATIONS
+        // Use the exact same logic as the pasture tab
         const pastureRecs = getPastureRecommendations(pastureData, locationMatch, aezData);
         
         response = `🌾 Pasture & Fodder Recommendations for ${locationMatch.ward} Ward\n\n`;
@@ -265,7 +261,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
       } else if (lowerMessage.includes('cereal')) {
         // SPECIFIC CEREAL CROPS
         const cerealCrops = getCropsByType(cropsData, 'Cereal');
-        const cerealRecs = generateCropRecommendations(locationMatch, 'Cereal');
+        const cerealRecs = generateCropRecommendations(locationMatch, 'cereal');
         
         response = `🌾 Cereal Crops for ${locationMatch.ward} Ward\n\n`;
         response += `📍 Location: ${locationMatch.ward} Ward, ${locationMatch.subcounty} Sub County, ${locationMatch.county}\n\n`;
@@ -305,7 +301,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
       } else if (lowerMessage.includes('legume')) {
         // SPECIFIC LEGUME CROPS
         const legumeCrops = getCropsByType(cropsData, 'Legume');
-        const legumeRecs = generateCropRecommendations(locationMatch, 'Legume');
+        const legumeRecs = generateCropRecommendations(locationMatch, 'legume');
         
         response = `🌱 Legume Crops for ${locationMatch.ward} Ward\n\n`;
         response += `📍 Location: ${locationMatch.ward} Ward, ${locationMatch.subcounty} Sub County, ${locationMatch.county}\n\n`;
@@ -345,7 +341,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
       } else if (lowerMessage.includes('vegetable')) {
         // SPECIFIC VEGETABLE CROPS
         const vegetableCrops = getCropsByType(cropsData, 'Vegetable');
-        const vegetableRecs = generateCropRecommendations(locationMatch, 'Vegetable');
+        const vegetableRecs = generateCropRecommendations(locationMatch, 'vegetable');
         
         response = `🥬 Vegetable Crops for ${locationMatch.ward} Ward\n\n`;
         response += `📍 Location: ${locationMatch.ward} Ward, ${locationMatch.subcounty} Sub County, ${locationMatch.county}\n\n`;
@@ -384,6 +380,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
         }
       } else {
         // GENERAL CROP RECOMMENDATIONS WITH CLICKABLE CARDS
+        // Use the exact same logic as the crops tab
         const recommendations = generateCropRecommendations(locationMatch);
         
         response = `🌾 Best Crops for ${locationMatch.ward} Ward\n\n`;
@@ -418,11 +415,11 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
           response += `• Consider soil testing before planting`;
           
           // Create clickable cards for different crop types
-          const cropTypes = ['Cereal', 'Legume', 'Vegetable', 'Root', 'Fruit'];
+          const cropTypes = ['cereal', 'legume', 'vegetable', 'root', 'fruit'];
           cropTypes.forEach(type => {
-            const typeCrops = getCropsByType(cropsData, type);
+            const typeCrops = recommendations.filter(rec => rec.crop.Type.toLowerCase() === type);
             if (typeCrops.length > 0) {
-              cards.push(createCropCard(`${type} Crops`, locationMatch, typeCrops, type));
+              cards.push(createCropCard(`${type.charAt(0).toUpperCase() + type.slice(1)} Crops`, locationMatch, typeCrops, type));
             }
           });
         } else {
