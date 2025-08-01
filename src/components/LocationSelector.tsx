@@ -45,9 +45,9 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 border border-green-100">
+    <div className="bg-white rounded-xl shadow-lg p-6 border border-amber-200">
       <div className="flex items-center gap-2 mb-6">
-        <MapPin className="w-5 h-5 text-green-600" />
+        <MapPin className="w-5 h-5 text-amber-600" />
         <h2 className="text-xl font-semibold text-gray-800">Select Location</h2>
       </div>
       
@@ -59,7 +59,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
             <select
               value={selectedCounty}
               onChange={(e) => handleCountyChange(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 appearance-none bg-white"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 appearance-none bg-white"
             >
               <option value="">Select County</option>
               {counties.map(county => (
@@ -78,7 +78,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
               value={selectedSubcounty}
               onChange={(e) => handleSubcountyChange(e.target.value)}
               disabled={!selectedCounty}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 appearance-none bg-white disabled:bg-gray-50 disabled:text-gray-400"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 appearance-none bg-white disabled:bg-gray-50 disabled:text-gray-400"
             >
               <option value="">Select Subcounty</option>
               {subcounties.map(subcounty => (
@@ -100,7 +100,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
                 if (ward) handleWardSelect(ward);
               }}
               disabled={!selectedSubcounty}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 appearance-none bg-white disabled:bg-gray-50 disabled:text-gray-400"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 appearance-none bg-white disabled:bg-gray-50 disabled:text-gray-400"
             >
               <option value="">Select Ward</option>
               {wards.map(ward => (

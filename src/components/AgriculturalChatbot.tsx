@@ -526,7 +526,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 w-16 h-16 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110 z-50"
+        className="fixed bottom-6 right-6 w-16 h-16 bg-gradient-to-br from-green-600 to-amber-600 hover:from-green-700 hover:to-amber-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110 z-50"
       >
         <MessageCircle className="w-8 h-8" />
       </button>
@@ -538,7 +538,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
       isMinimized ? 'w-80 h-16' : 'w-96 h-[600px]'
     }`}>
       {/* Header */}
-      <div className="bg-gradient-to-r from-green-600 to-emerald-600 text-white p-4 rounded-t-xl flex items-center justify-between">
+      <div className="bg-gradient-to-r from-green-600 to-amber-600 text-white p-4 rounded-t-xl flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
             <Sprout className="w-5 h-5" />

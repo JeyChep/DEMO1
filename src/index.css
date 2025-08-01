@@ -11,7 +11,7 @@
   height: 20px;
   width: 20px;
   border-radius: 50%;
-  background: #16a34a;
+  background: linear-gradient(135deg, #16a34a, #d97706);
   cursor: pointer;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
@@ -20,7 +20,7 @@
   height: 20px;
   width: 20px;
   border-radius: 50%;
-  background: #16a34a;
+  background: linear-gradient(135deg, #16a34a, #d97706);
   cursor: pointer;
   border: none;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -36,12 +36,12 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #16a34a;
+  background: linear-gradient(135deg, #16a34a, #d97706);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #15803d;
+  background: linear-gradient(135deg, #15803d, #c2410c);
 }
 
 /* Smooth transitions */
@@ -54,9 +54,7 @@ button:focus,
 select:focus,
 input:focus {
   outline: none;
-  ring: 2px;
-  ring-color: #16a34a;
-  ring-opacity: 0.5;
+  box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.5);
 }
 
 /* Hover effects */
@@ -77,11 +75,11 @@ input:focus {
 
 /* Leaflet control styling */
 .leaflet-control-zoom a {
-  background-color: #16a34a !important;
+  background: linear-gradient(135deg, #16a34a, #d97706) !important;
   color: white !important;
   border: none !important;
 }
 
 .leaflet-control-zoom a:hover {
-  background-color: #15803d !important;
+  background: linear-gradient(135deg, #15803d, #c2410c) !important;
 }

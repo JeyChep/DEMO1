@@ -316,21 +316,21 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-amber-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-green-100">
+      <header className="bg-white shadow-sm border-b border-amber-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center">
-                <Leaf className="w-8 h-8 text-white" />
+              <div className="w-16 h-16 bg-gradient-to-br from-green-600 to-amber-600 rounded-full flex items-center justify-center shadow-lg">
+                <div className="text-white font-bold text-lg">KALRO</div>
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">KALRO Selector</h1>
                 <p className="text-sm text-gray-600">
                   Kenya Agricultural & Livestock Research Organization • Smart Agricultural Recommendations
                 </p>
-                <p className="text-xs text-green-600 font-medium">
+                <p className="text-xs text-amber-700 font-medium">
                   {cropsData.length} crops • {livestockData.length} livestock • {pastureData.length} pastures
                 </p>
               </div>
@@ -338,14 +338,14 @@ function App() {
             
             <button
               onClick={handleLocationDetection}
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200"
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-600 to-amber-600 text-white rounded-lg hover:from-green-700 hover:to-amber-700 transition-all duration-200 shadow-md"
             >
               <Navigation className="w-4 h-4" />
               Detect Location
             </button>
           </div>
           {locationError && (
-            <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg shadow-sm">
               <p className="text-red-700 text-sm">{locationError}</p>
             </div>
           )}
@@ -354,7 +354,7 @@ function App() {
 
       {/* Hero Section */}
       {!selectedLocation && activeTab !== 'suitability-map' && (
-        <div className="relative bg-gradient-to-r from-green-600 to-emerald-600 text-white py-16">
+        <div className="relative bg-gradient-to-r from-green-600 via-green-700 to-amber-600 text-white py-16">
           <div className="absolute inset-0 bg-black opacity-20"></div>
           <div 
             className="absolute inset-0 bg-cover bg-center opacity-30"
@@ -372,12 +372,12 @@ function App() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
                 onClick={handleLocationDetection}
-                className="flex items-center justify-center gap-2 px-6 py-3 bg-white text-green-600 rounded-lg hover:bg-green-50 transition-colors duration-200 font-semibold"
+                className="flex items-center justify-center gap-2 px-6 py-3 bg-white text-green-700 rounded-lg hover:bg-amber-50 transition-colors duration-200 font-semibold shadow-lg"
               >
                 <Navigation className="w-5 h-5" />
                 Auto-Detect My Location
               </button>
-              <div className="text-green-100">or select manually below</div>
+              <div className="text-green-100 self-center">or select manually below</div>
             </div>
           </div>
         </div>
@@ -410,7 +410,7 @@ function App() {
               <div className="flex justify-center">
                 <button
                   onClick={() => setShowLocationMap(!showLocationMap)}
-                  className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200"
+                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-600 to-amber-600 text-white rounded-lg hover:from-green-700 hover:to-amber-700 transition-all duration-200 shadow-md"
                 >
                   <MapPin className="w-4 h-4" />
                   {showLocationMap ? 'Hide Location Map' : 'View Location on Map'}
@@ -432,10 +432,10 @@ function App() {
 
           {/* Economics Toggle for Crops Tab */}
           {activeTab === 'crops' && selectedLocation && cropEconomicsData.length > 0 && (
-            <div className="bg-white rounded-xl shadow-lg p-4 border border-green-100">
+            <div className="bg-white rounded-xl shadow-lg p-4 border border-amber-200">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <DollarSign className="w-5 h-5 text-green-600" />
+                  <DollarSign className="w-5 h-5 text-amber-600" />
                   <div>
                     <h4 className="font-semibold text-gray-800">Cost-Benefit Analysis</h4>
                     <p className="text-sm text-gray-600">View detailed economic analysis for crop recommendations</p>
@@ -445,7 +445,7 @@ function App() {
                   onClick={() => setShowEconomics(!showEconomics)}
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                     showEconomics 
-                      ? 'bg-green-600 text-white hover:bg-green-700' 
+                      ? 'bg-gradient-to-r from-green-600 to-amber-600 text-white hover:from-green-700 hover:to-amber-700' 
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
@@ -486,7 +486,7 @@ function App() {
       />
 
       {/* KALRO Contact Information */}
-      <section className="bg-green-600 text-white py-12">
+      <section className="bg-gradient-to-r from-green-600 via-green-700 to-amber-600 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
             <h3 className="text-2xl font-bold mb-2">Contact KALRO</h3>
@@ -495,8 +495,8 @@ function App() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Headquarters */}
-            <div className="bg-green-700 rounded-lg p-6 text-center">
-              <Location className="w-8 h-8 mx-auto mb-3 text-green-200" />
+            <div className="bg-green-700 bg-opacity-80 rounded-lg p-6 text-center backdrop-blur-sm">
+              <Location className="w-8 h-8 mx-auto mb-3 text-amber-200" />
               <h4 className="font-semibold mb-2">Headquarters</h4>
               <p className="text-sm text-green-100">
                 KALRO Secretariat<br />
@@ -507,8 +507,8 @@ function App() {
             </div>
 
             {/* Phone */}
-            <div className="bg-green-700 rounded-lg p-6 text-center">
-              <Phone className="w-8 h-8 mx-auto mb-3 text-green-200" />
+            <div className="bg-green-700 bg-opacity-80 rounded-lg p-6 text-center backdrop-blur-sm">
+              <Phone className="w-8 h-8 mx-auto mb-3 text-amber-200" />
               <h4 className="font-semibold mb-2">Phone</h4>
               <p className="text-sm text-green-100">
                 +254 722 206 986<br />
@@ -518,8 +518,8 @@ function App() {
             </div>
 
             {/* Email */}
-            <div className="bg-green-700 rounded-lg p-6 text-center">
-              <Mail className="w-8 h-8 mx-auto mb-3 text-green-200" />
+            <div className="bg-green-700 bg-opacity-80 rounded-lg p-6 text-center backdrop-blur-sm">
+              <Mail className="w-8 h-8 mx-auto mb-3 text-amber-200" />
               <h4 className="font-semibold mb-2">Email</h4>
               <p className="text-sm text-green-100">
                 info@kalro.org<br />
@@ -529,15 +529,15 @@ function App() {
             </div>
 
             {/* Website */}
-            <div className="bg-green-700 rounded-lg p-6 text-center">
-              <Globe className="w-8 h-8 mx-auto mb-3 text-green-200" />
+            <div className="bg-green-700 bg-opacity-80 rounded-lg p-6 text-center backdrop-blur-sm">
+              <Globe className="w-8 h-8 mx-auto mb-3 text-amber-200" />
               <h4 className="font-semibold mb-2">Website</h4>
               <p className="text-sm text-green-100">
                 <a href="https://www.kalro.org" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
                   www.kalro.org
                 </a>
               </p>
-              <p className="text-xs text-green-200 mt-2">
+              <p className="text-xs text-amber-200 mt-2">
                 Visit for more research & services
               </p>
             </div>
@@ -547,11 +547,13 @@ function App() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-green-100">
+      <footer className="bg-white border-t border-amber-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center text-gray-600">
             <div className="flex items-center justify-center gap-2 mb-2">
-              <Leaf className="w-5 h-5 text-green-600" />
+              <div className="w-6 h-6 bg-gradient-to-br from-green-600 to-amber-600 rounded-full flex items-center justify-center">
+                <span className="text-white text-xs font-bold">K</span>
+              </div>
               <p className="font-semibold">KALRO Selector</p>
             </div>
             <p className="text-xs text-gray-500">
