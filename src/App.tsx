@@ -59,14 +59,16 @@ function App() {
         // Load crop economics data
         const economicsResponse = await fetch('/src/data/crop_economics.csv');
         if (!economicsResponse.ok) {
-          throw new Error(`Failed to load crop economics dataset: ${economicsResponse.status} ${economicsResponse.statusText}`);
+          console.warn(`Failed to load crop economics dataset: ${economicsResponse.status} ${economicsResponse.statusText}`);
+          setLoadingProgress(40);
+        } else {
+          setLoadingProgress(35);
+          
+          const economicsText = await economicsResponse.text();
+          const economics = parseCropEconomicsCSV(economicsText);
+          setCropEconomicsData(economics);
+          setLoadingProgress(40);
         }
-        setLoadingProgress(35);
-        
-        const economicsText = await economicsResponse.text();
-        const economics = parseCropEconomicsCSV(economicsText);
-        setCropEconomicsData(economics);
-        setLoadingProgress(40);
 
         // Load climate data
         const climateResponse = await fetch('/src/data/WARDS_CLIMATE.csv');
@@ -117,7 +119,7 @@ function App() {
 
         console.log(`Successfully loaded:
           - ${crops.length} crop varieties
-          - ${economics.length} crop economic profiles
+          - ${economics?.length || 0} crop economic profiles
           - ${climate.length} locations
           - ${livestock.length} livestock breeds
           - ${pasture.length} pasture varieties
@@ -127,7 +129,7 @@ function App() {
           throw new Error('No valid crop data found in the dataset');
         }
         
-        if (economics.length === 0) {
+        if ((economics?.length || 0) === 0) {
           console.warn('No crop economics data found - cost-benefit analysis will be limited');
         }
         
