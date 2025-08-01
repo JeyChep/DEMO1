@@ -259,7 +259,14 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
     const filteredCrops = cropsData.filter(crop => crop.Type === cropType);
     const recommendations = getTopCropRecommendations(filteredCrops, location, 20);
     
-    // Try different suitability thresholds to find crops
+    // Try different suitability thresholds to ensure we find crops
+    let finalRecs = recommendations.filter(rec => rec.suitabilityScore >= 40);
+    if (finalRecs.length === 0) {
+      finalRecs = recommendations.filter(rec => rec.suitabilityScore >= 20);
+    }
+    if (finalRecs.length === 0) {
+      finalRecs = recommendations.slice(0, 8); // Show top 8 regardless of score
+    }
     let finalRecs = recommendations.filter(rec => rec.suitabilityScore >= 40);
     if (finalRecs.length === 0) {
       finalRecs = recommendations.filter(rec => rec.suitabilityScore >= 20);
@@ -348,11 +355,10 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
     );
     
     const recommendations = getLivestockRecommendations(filteredLivestock, location, aezData);
-    const aez = determineAEZ(location, aezData);
     
     let response = `🐄 <span style="color: #16a34a; font-weight: bold;">${livestockType} for ${location.ward} Ward</span>\n\n`;
     response += `📍 <span style="color: #16a34a; font-weight: bold;">Location:</span> ${location.ward}, ${location.subcounty}, ${location.county}\n`;
-    response += `🏔️ <span style="color: #16a34a; font-weight: bold;">Zone:</span> ${aez.toUpperCase()}\n\n`;
+    response += `\n`;
     
     if (recommendations.length > 0) {
       response += `🏆 <span style="color: #16a34a; font-weight: bold;">Perfect ${livestockType} for ${location.ward}:</span>\n\n`;
@@ -416,11 +422,10 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
     );
     
     const recommendations = getPastureRecommendations(filteredPasture, location, aezData);
-    const aez = determineAEZ(location, aezData);
     
     let response = `🌾 <span style="color: #16a34a; font-weight: bold;">${pastureType} for ${location.ward} Ward</span>\n\n`;
     response += `📍 <span style="color: #16a34a; font-weight: bold;">Location:</span> ${location.ward}, ${location.subcounty}, ${location.county}\n`;
-    response += `🏔️ <span style="color: #16a34a; font-weight: bold;">Zone:</span> ${aez.toUpperCase()}\n\n`;
+    response += `\n`;
     
     if (recommendations.length > 0) {
       response += `🏆 <span style="color: #16a34a; font-weight: bold;">Perfect ${pastureType} for ${location.ward}:</span>\n\n`;
@@ -488,14 +493,11 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
       finalRecs = recommendations.slice(0, 10); // Show top 10 even if low scores
     }
     
-    const aez = determineAEZ(location, aezData);
-    
     let response = `🌱 <span style="color: #16a34a; font-weight: bold;">Best Crops for ${location.ward} Ward</span>\n\n`;
     
     // Location info
     response += `📍 <span style="color: #16a34a; font-weight: bold;">Location:</span> ${location.ward}, ${location.subcounty}, ${location.county}\n\n`;
-    
-    if (finalRecs.length > 0) {
+    response += `\n`;
       response += `🏆 <span style="color: #16a34a; font-weight: bold;">Top Recommended Crops:</span>\n\n`;
       
       // Group by crop name for better structure
