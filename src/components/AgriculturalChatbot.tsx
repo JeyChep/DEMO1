@@ -93,7 +93,6 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
       filteredRecs = filteredRecs.filter(rec => rec.crop.Type.toLowerCase() === cropType.toLowerCase());
     }
     
-    const recommendations = getTopCropRecommendations(targetCrops, location, 50);
     return filteredRecs;
   };
 
