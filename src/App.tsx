@@ -57,6 +57,7 @@ function App() {
         setLoadingProgress(25);
 
         // Load crop economics data
+        let economics: CropEconomics[] = [];
         const economicsResponse = await fetch('/src/data/crop_economics.csv');
         if (!economicsResponse.ok) {
           console.warn(`Failed to load crop economics dataset: ${economicsResponse.status} ${economicsResponse.statusText}`);
@@ -65,7 +66,7 @@ function App() {
           setLoadingProgress(35);
           
           const economicsText = await economicsResponse.text();
-          const economics = parseCropEconomicsCSV(economicsText);
+          economics = parseCropEconomicsCSV(economicsText);
           setCropEconomicsData(economics);
           setLoadingProgress(40);
         }
