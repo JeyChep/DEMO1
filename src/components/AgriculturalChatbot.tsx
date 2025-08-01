@@ -223,7 +223,6 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
   const processMessage = async (message: string) => {
     setIsTyping(true);
     
-      response = `I couldn't find that location in our database. 📍\n\n`;
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     const lowerMessage = message.toLowerCase();
