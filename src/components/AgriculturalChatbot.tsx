@@ -379,18 +379,18 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
         }
       } else {
         // GENERAL CROP RECOMMENDATIONS WITH CLICKABLE CARDS
-        // Use the exact same logic as the crops tab
-        const recommendations = generateCropRecommendations(locationMatch);
+        const recommendations = getTopCropRecommendations(cropsData, locationMatch, 100);
+        let filteredRecs = recommendations.filter(rec => rec.suitabilityScore >= 60);
         
-        response = `🌾 Best Crops for ${locationMatch.ward} Ward\n\n`;
-        response += `📍 Location: ${locationMatch.ward} Ward, ${locationMatch.subcounty} Sub County, ${locationMatch.county}\n\n`;
-        
+        if (filteredRecs.length === 0 && recommendations.length > 0) {
+          filteredRecs = recommendations.slice(0, 20);
+        }
         if (recommendations.length > 0) {
-          response += `🏆 **Top Recommended Crops:**\n\n`;
+          response += `🏆 **Top Recommended Crops (${filteredRecs.length} varieties):**\n\n`;
           
           const groupedCrops: { [key: string]: string[] } = {};
           
-          recommendations.slice(0, 8).forEach(rec => {
+          filteredRecs.slice(0, 15).forEach(rec => {
             const cropName = rec.crop.Crop;
             if (!groupedCrops[cropName]) {
               groupedCrops[cropName] = [];
@@ -414,7 +414,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
           response += `• Consider soil testing before planting`;
           
           // Create clickable cards for different crop types
-          const cropTypes = ['cereal', 'legume', 'vegetable', 'root', 'fruit'];
+          const cropTypes = ['cereal', 'legume', 'vegetable', 'root', 'fruit', 'cash', 'spice', 'oil'];
           cropTypes.forEach(type => {
             const typeCrops = recommendations.filter(rec => rec.crop.Type.toLowerCase() === type);
             if (typeCrops.length > 0) {
