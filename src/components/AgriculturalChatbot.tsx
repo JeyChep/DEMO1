@@ -53,52 +53,49 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
   const findLocationByName = (locationName: string): ClimateData | null => {
     const searchTerm = locationName.toLowerCase().trim();
     
-    // Extract potential location words from the message (split by spaces, commas, etc.)
-    const words = searchTerm.split(/[\s,.-]+/).filter(word => word.length > 1);
+    // Extract potential location words from the message
+    const words = searchTerm.split(/[\s,.-]+/).filter(word => word.length > 2);
     
     console.log('Searching for location in:', searchTerm);
     console.log('Search words:', words);
+    console.log('Available locations sample:', climateData.slice(0, 5).map(l => `${l.ward}, ${l.subcounty}, ${l.county}`));
     
-    // Priority 1: Exact matches (highest priority)
+    // Priority 1: Exact ward name matches
     for (const location of climateData) {
       const ward = location.ward.toLowerCase();
       const subcounty = location.subcounty.toLowerCase();
       const county = location.county.toLowerCase();
       
-      // Exact full matches
+      // Check if any word exactly matches ward, subcounty, or county
+      for (const word of words) {
+        if (ward === word || subcounty === word || county === word) {
+          console.log('Found exact word match:', word, '→', location.ward, location.subcounty, location.county);
+          return location;
+        }
+      }
+      
+      // Also check full search term
       if (ward === searchTerm || subcounty === searchTerm || county === searchTerm) {
         console.log('Found exact match:', location.ward, location.subcounty, location.county);
         return location;
       }
     }
     
-    // Priority 2: Exact word matches
+    // Priority 2: Contains matches
     for (const location of climateData) {
       const ward = location.ward.toLowerCase();
       const subcounty = location.subcounty.toLowerCase();
       const county = location.county.toLowerCase();
       
       for (const word of words) {
-        if (ward === word || subcounty === word || county === word) {
-          console.log('Found word match:', word, '→', location.ward, location.subcounty, location.county);
+        if (ward.includes(word) || subcounty.includes(word) || county.includes(word)) {
+          console.log('Found contains match:', word, '→', location.ward, location.subcounty, location.county);
           return location;
         }
       }
     }
     
-    // Priority 3: Partial matches (contains)
-    for (const location of climateData) {
-      const ward = location.ward.toLowerCase();
-      const subcounty = location.subcounty.toLowerCase();
-      const county = location.county.toLowerCase();
-      
-      if (ward.includes(searchTerm) || subcounty.includes(searchTerm) || county.includes(searchTerm)) {
-        console.log('Found partial match:', searchTerm, '→', location.ward, location.subcounty, location.county);
-        return location;
-      }
-    }
-    
-    // Priority 4: Search term contains location name
+    // Priority 3: Search term contains location name
     for (const location of climateData) {
       const ward = location.ward.toLowerCase();
       const subcounty = location.subcounty.toLowerCase();
@@ -110,40 +107,8 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
       }
     }
     
-    // Priority 5: Word-level partial matches
-    for (const location of climateData) {
-      const ward = location.ward.toLowerCase();
-      const subcounty = location.subcounty.toLowerCase();
-      const county = location.county.toLowerCase();
-      
-      for (const word of words) {
-        if (word.length > 2) { // Only check meaningful words
-          if (ward.includes(word) || subcounty.includes(word) || county.includes(word)) {
-            console.log('Found word partial match:', word, '→', location.ward, location.subcounty, location.county);
-            return location;
-          }
-        }
-      }
-    }
-    
-    // Priority 6: Fuzzy matching for common misspellings/variations
-    for (const location of climateData) {
-      const ward = location.ward.toLowerCase();
-      const subcounty = location.subcounty.toLowerCase();
-      const county = location.county.toLowerCase();
-      
-      // Check if any word is very similar (simple edit distance)
-      for (const word of words) {
-        if (word.length > 3) {
-          if (isSimular(word, ward) || isSimular(word, subcounty) || isSimular(word, county)) {
-            console.log('Found fuzzy match:', word, '→', location.ward, location.subcounty, location.county);
-            return location;
-          }
-        }
-      }
-    }
-    
     console.log('No location found for:', searchTerm);
+    console.log('Total locations in database:', climateData.length);
     return null;
   };
 
@@ -258,7 +223,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
   const processMessage = async (message: string) => {
     setIsTyping(true);
     
-    // Simulate thinking time
+      response = `I couldn't find that location in our database. 📍\n\n`;
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     const lowerMessage = message.toLowerCase();
@@ -484,9 +449,9 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
       response = `I couldn't find that location in our database. 📍\n\n`;
       response += `I have data for ${climateData.length} wards across Kenya.\n\n`;
       response += `Please try:\n`;
-      response += `• Full ward name: "What crops can I grow in Kandara ward?"\n`;
-      response += `• County name: "Show me crops for Murang'a county"\n`;
-      response += `• Subcounty name: "Best crops for Kandara subcounty"\n\n`;
+      response += `• Ward name: "crops in kamagut ward"\n`;
+      response += `• County name: "crops for Murang'a"\n`;
+      response += `• Subcounty name: "livestock for Kandara"\n\n`;
       response += `Examples that work:\n`;
       response += `• "crops in Nairobi"\n`;
       response += `• "livestock for Meru"\n`;
