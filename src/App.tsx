@@ -323,7 +323,7 @@ function App() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-16 h-16 bg-gradient-to-br from-green-600 to-green-700 rounded-full flex items-center justify-center shadow-lg">
-                <div className="text-white font-bold text-lg">KALRO</div>
+                {/* Logo will be inserted here */}
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">KALRO Selector</h1>
@@ -552,7 +552,7 @@ function App() {
           <div className="text-center text-gray-600">
             <div className="flex items-center justify-center gap-2 mb-2">
               <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
-                <span className="text-white text-xs font-bold">K</span>
+                {/* Small logo placeholder */}
               </div>
               <p className="font-semibold">KALRO Selector</p>
             </div>
