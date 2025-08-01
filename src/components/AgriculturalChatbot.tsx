@@ -53,26 +53,50 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
   const findLocationByName = (locationName: string): ClimateData | null => {
     const searchTerm = locationName.toLowerCase().trim();
     
-    // Try exact matches first
-    let location = climateData.find(loc => 
-      loc.ward.toLowerCase() === searchTerm ||
-      loc.subcounty.toLowerCase() === searchTerm ||
-      loc.county.toLowerCase() === searchTerm
-    );
+    // Extract potential location words from the message
+    const words = searchTerm.split(/\s+/);
     
-    if (!location) {
-      // Try partial matches
-      location = climateData.find(loc => 
-        loc.ward.toLowerCase().includes(searchTerm) ||
-        loc.subcounty.toLowerCase().includes(searchTerm) ||
-        loc.county.toLowerCase().includes(searchTerm) ||
-        searchTerm.includes(loc.ward.toLowerCase()) ||
-        searchTerm.includes(loc.subcounty.toLowerCase()) ||
-        searchTerm.includes(loc.county.toLowerCase())
-      );
+    // Try to find location by checking each word and combination
+    for (const location of climateData) {
+      const ward = location.ward.toLowerCase();
+      const subcounty = location.subcounty.toLowerCase();
+      const county = location.county.toLowerCase();
+      
+      // Check exact matches first
+      if (ward === searchTerm || subcounty === searchTerm || county === searchTerm) {
+        return location;
+      }
+      
+      // Check if any word matches ward, subcounty, or county
+      for (const word of words) {
+        if (word.length > 2) { // Ignore very short words
+          if (ward === word || subcounty === word || county === word) {
+            return location;
+          }
+        }
+      }
+      
+      // Check partial matches
+      if (ward.includes(searchTerm) || subcounty.includes(searchTerm) || county.includes(searchTerm)) {
+        return location;
+      }
+      
+      // Check if search term contains location names
+      if (searchTerm.includes(ward) || searchTerm.includes(subcounty) || searchTerm.includes(county)) {
+        return location;
+      }
+      
+      // Check individual words for partial matches
+      for (const word of words) {
+        if (word.length > 2) {
+          if (ward.includes(word) || subcounty.includes(word) || county.includes(word)) {
+            return location;
+          }
+        }
+      }
     }
     
-    return location || null;
+    return null;
   };
 
   const getCropsByType = (crops: CropData[], type: string): CropData[] => {
