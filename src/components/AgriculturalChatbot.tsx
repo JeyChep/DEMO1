@@ -54,7 +54,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
     const searchTerm = locationText.toLowerCase().trim();
     const words = searchTerm.split(/[\s,.-]+/).filter(word => word.length > 2);
     
-    console.log('Searching for location:', searchTerm);
+    console.log('Searching for location:', searchTerm, 'in', climateData.length, 'wards');
     
     // Priority 1: Exact matches
     for (const location of climateData) {
@@ -63,12 +63,14 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
       const county = location.county.toLowerCase();
       
       if (ward === searchTerm || subcounty === searchTerm || county === searchTerm) {
+        console.log('Found exact match:', location.ward, location.subcounty, location.county);
         return location;
       }
       
       // Check individual words
       for (const word of words) {
         if (ward === word || subcounty === word || county === word) {
+          console.log('Found word match:', location.ward, location.subcounty, location.county);
           return location;
         }
       }
@@ -82,11 +84,13 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
       
       for (const word of words) {
         if (ward.includes(word) || subcounty.includes(word) || county.includes(word)) {
+          console.log('Found partial match:', location.ward, location.subcounty, location.county);
           return location;
         }
       }
     }
     
+    console.log('No location found for:', searchTerm);
     return null;
   };
 
@@ -188,7 +192,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
     
     Object.entries(groupedCrops).forEach(([cropName, varieties]) => {
       response += `<div class="mb-3">`;
-      response += `<div class="font-semibold text-gray-800 mb-1">${cropName}:</div>`;
+      response += `<div class="font-semibold text-green-600 mb-1">${cropName}:</div>`;
       response += `<div class="text-gray-700 text-sm">${formatVarietiesHorizontally(varieties)}</div>`;
       response += `</div>`;
     });
@@ -232,7 +236,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
     
     Object.entries(groupedLivestock).forEach(([type, breeds]) => {
       response += `<div class="mb-3">`;
-      response += `<div class="font-semibold text-gray-800 mb-1">${type}:</div>`;
+      response += `<div class="font-semibold text-green-600 mb-1">${type}:</div>`;
       response += `<div class="text-gray-700 text-sm">${formatVarietiesHorizontally(breeds)}</div>`;
       response += `</div>`;
     });
@@ -267,7 +271,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
     
     Object.entries(groupedPasture).forEach(([type, varieties]) => {
       response += `<div class="mb-3">`;
-      response += `<div class="font-semibold text-gray-800 mb-1">${type}:</div>`;
+      response += `<div class="font-semibold text-green-600 mb-1">${type}:</div>`;
       response += `<div class="text-gray-700 text-sm">${formatVarietiesHorizontally(varieties)}</div>`;
       response += `</div>`;
     });
@@ -285,15 +289,23 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
     
     await new Promise(resolve => setTimeout(resolve, 1000));
     
+    console.log('Processing message:', message);
     const location = findLocationByName(message);
+    console.log('Found location:', location ? `${location.ward}, ${location.subcounty}, ${location.county}` : 'None');
     const { intent, cropType } = classifyIntent(message);
+    console.log('Intent:', intent, 'Crop type:', cropType);
     
     let response = '';
     let isHtml = false;
     
     if (!location) {
       response = `🔍 I couldn't find that location in our database.\n\n`;
-      response += `I have data for ${climateData.length} wards across Kenya.\n\n`;
+      response += `I have data for ${climateData.length} wards across Kenya including:\n`;
+      
+      // Show some example wards from different counties
+      const exampleWards = climateData.slice(0, 10).map(w => `${w.ward} (${w.county})`).join(', ');
+      response += `${exampleWards}...\n\n`;
+      
       response += `Please try:\n`;
       response += `• "What crops are suitable for Kandara ward?"\n`;
       response += `• "Show me livestock for Meru county"\n`;
