@@ -32,7 +32,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: "🌾 Hello! I'm your KALRO Agricultural Assistant. I can help you find the best crops, livestock, and pasture for any ward in Kenya.\n\n💬 Try asking me:\n• \"What crops are suitable for Kandara ward?\"\n• \"Show me cereals for Nairobi\"\n• \"What livestock can I keep in Meru?\"\n• \"Dairy cattle breeds for my area\"\n• \"Fodder crops for Nakuru ward\"",
+      text: "🌾 Hello! I'm your KALRO Agricultural Assistant. I can help you find the best crops, livestock, and pasture for any ward in Kenya.\n\n💬 Ask me naturally - I understand farmer language:\n• \"What can I grow in Kandara?\"\n• \"Show me maize varieties for my area\"\n• \"Which cows are good for Meru?\"\n• \"I want to plant tomatoes in Nakuru\"\n• \"What grass is good for my animals?\"\n• \"Coffee farming in Kiambu\"\n• \"Beans for Machakos ward\"",
       isUser: false,
       timestamp: new Date()
     }
@@ -109,58 +109,87 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
     if (lowerMessage.includes('livestock') || lowerMessage.includes('animal')) {
       return { intent: 'livestock' };
     }
-    if (lowerMessage.includes('cattle') || lowerMessage.includes('cow') || lowerMessage.includes('dairy')) {
+    if (lowerMessage.includes('cattle') || lowerMessage.includes('cow') || lowerMessage.includes('dairy') || 
+        lowerMessage.includes('bull') || lowerMessage.includes('heifer') || lowerMessage.includes('milk')) {
       return { intent: 'livestock', cropType: 'cattle' };
     }
-    if (lowerMessage.includes('goat') || lowerMessage.includes('sheep')) {
+    if (lowerMessage.includes('goat') || lowerMessage.includes('sheep') || lowerMessage.includes('lamb') || 
+        lowerMessage.includes('mutton') || lowerMessage.includes('chevon')) {
       return { intent: 'livestock', cropType: 'goat' };
     }
-    if (lowerMessage.includes('chicken') || lowerMessage.includes('poultry')) {
+    if (lowerMessage.includes('chicken') || lowerMessage.includes('poultry') || lowerMessage.includes('hen') || 
+        lowerMessage.includes('cock') || lowerMessage.includes('broiler') || lowerMessage.includes('layer') ||
+        lowerMessage.includes('egg') || lowerMessage.includes('duck') || lowerMessage.includes('turkey')) {
       return { intent: 'livestock', cropType: 'poultry' };
     }
     
     // Pasture/fodder intents
-    if (lowerMessage.includes('pasture') || lowerMessage.includes('fodder') || lowerMessage.includes('grass') || lowerMessage.includes('feed')) {
+    if (lowerMessage.includes('pasture') || lowerMessage.includes('fodder') || lowerMessage.includes('grass') || 
+        lowerMessage.includes('feed') || lowerMessage.includes('hay') || lowerMessage.includes('silage') ||
+        lowerMessage.includes('animal feed') || lowerMessage.includes('grazing')) {
       return { intent: 'pasture' };
     }
     
-    // Crop type intents
-    if (lowerMessage.includes('cereal') || lowerMessage.includes('grain')) {
+    // Crop type intents - much more farmer-friendly
+    if (lowerMessage.includes('cereal') || lowerMessage.includes('grain') || lowerMessage.includes('maize') || 
+        lowerMessage.includes('corn') || lowerMessage.includes('wheat') || lowerMessage.includes('rice') ||
+        lowerMessage.includes('barley') || lowerMessage.includes('sorghum') || lowerMessage.includes('millet') ||
+        lowerMessage.includes('staple') || lowerMessage.includes('food crop')) {
       return { intent: 'crops', cropType: 'Cereals' };
     }
-    if (lowerMessage.includes('legume') || lowerMessage.includes('bean') || lowerMessage.includes('pea') || lowerMessage.includes('pulse')) {
+    if (lowerMessage.includes('legume') || lowerMessage.includes('bean') || lowerMessage.includes('pea') || 
+        lowerMessage.includes('pulse') || lowerMessage.includes('groundnut') || lowerMessage.includes('peanut') ||
+        lowerMessage.includes('cowpea') || lowerMessage.includes('green gram') || lowerMessage.includes('pigeon pea') ||
+        lowerMessage.includes('soya') || lowerMessage.includes('protein crop')) {
       return { intent: 'crops', cropType: 'Legumes' };
     }
-    if (lowerMessage.includes('vegetable') || lowerMessage.includes('veggie')) {
+    if (lowerMessage.includes('vegetable') || lowerMessage.includes('veggie') || lowerMessage.includes('tomato') ||
+        lowerMessage.includes('onion') || lowerMessage.includes('cabbage') || lowerMessage.includes('kale') ||
+        lowerMessage.includes('spinach') || lowerMessage.includes('carrot') || lowerMessage.includes('pepper') ||
+        lowerMessage.includes('sukuma wiki') || lowerMessage.includes('greens') || lowerMessage.includes('salad')) {
       return { intent: 'crops', cropType: 'Vegetables' };
     }
-    if (lowerMessage.includes('fruit') || lowerMessage.includes('tree fruit')) {
+    if (lowerMessage.includes('fruit') || lowerMessage.includes('tree fruit') || lowerMessage.includes('mango') ||
+        lowerMessage.includes('banana') || lowerMessage.includes('orange') || lowerMessage.includes('avocado') ||
+        lowerMessage.includes('passion fruit') || lowerMessage.includes('citrus') || lowerMessage.includes('orchard')) {
       return { intent: 'crops', cropType: 'Fruits' };
     }
-    if (lowerMessage.includes('root') || lowerMessage.includes('potato') || lowerMessage.includes('cassava') || lowerMessage.includes('tuber')) {
+    if (lowerMessage.includes('root') || lowerMessage.includes('potato') || lowerMessage.includes('cassava') || 
+        lowerMessage.includes('tuber') || lowerMessage.includes('sweet potato') || lowerMessage.includes('yam') ||
+        lowerMessage.includes('irish potato') || lowerMessage.includes('underground crop')) {
       return { intent: 'crops', cropType: 'Roots and Tubers' };
     }
-    if (lowerMessage.includes('cash crop') || lowerMessage.includes('cash') || lowerMessage.includes('coffee') || lowerMessage.includes('tea') || lowerMessage.includes('tobacco')) {
+    if (lowerMessage.includes('cash crop') || lowerMessage.includes('cash') || lowerMessage.includes('coffee') || 
+        lowerMessage.includes('tea') || lowerMessage.includes('tobacco') || lowerMessage.includes('cotton') ||
+        lowerMessage.includes('sugarcane') || lowerMessage.includes('export crop') || lowerMessage.includes('commercial')) {
       return { intent: 'crops', cropType: 'Cash Crops' };
     }
-    if (lowerMessage.includes('spice') || lowerMessage.includes('herb')) {
+    if (lowerMessage.includes('spice') || lowerMessage.includes('herb') || lowerMessage.includes('chili') ||
+        lowerMessage.includes('pepper') || lowerMessage.includes('ginger') || lowerMessage.includes('turmeric') ||
+        lowerMessage.includes('coriander') || lowerMessage.includes('seasoning')) {
       return { intent: 'crops', cropType: 'Spices' };
     }
-    if (lowerMessage.includes('oil') || lowerMessage.includes('oilseed')) {
+    if (lowerMessage.includes('oil') || lowerMessage.includes('oilseed') || lowerMessage.includes('sunflower') ||
+        lowerMessage.includes('sesame') || lowerMessage.includes('cooking oil') || lowerMessage.includes('oil crop')) {
       return { intent: 'crops', cropType: 'Oil Crops' };
     }
-    if (lowerMessage.includes('medicinal') || lowerMessage.includes('aromatic')) {
+    if (lowerMessage.includes('medicinal') || lowerMessage.includes('aromatic') || lowerMessage.includes('herbal') ||
+        lowerMessage.includes('medicine') || lowerMessage.includes('traditional medicine')) {
       return { intent: 'crops', cropType: 'Medicinal and Aromatic' };
     }
-    if (lowerMessage.includes('horticulture') || lowerMessage.includes('horticultural')) {
+    if (lowerMessage.includes('horticulture') || lowerMessage.includes('horticultural') || lowerMessage.includes('flower') ||
+        lowerMessage.includes('ornamental') || lowerMessage.includes('nursery') || lowerMessage.includes('garden')) {
       return { intent: 'crops', cropType: 'Horticulture' };
     }
-    if (lowerMessage.includes('indigenous')) {
+    if (lowerMessage.includes('indigenous') || lowerMessage.includes('traditional') || lowerMessage.includes('local') ||
+        lowerMessage.includes('native') || lowerMessage.includes('african') || lowerMessage.includes('wild')) {
       return { intent: 'crops', cropType: 'Indigenous Vegetables' };
     }
     
     // General crop intent
-    if (lowerMessage.includes('crop') || lowerMessage.includes('plant') || lowerMessage.includes('grow') || lowerMessage.includes('farm')) {
+    if (lowerMessage.includes('crop') || lowerMessage.includes('plant') || lowerMessage.includes('grow') || 
+        lowerMessage.includes('farm') || lowerMessage.includes('cultivate') || lowerMessage.includes('harvest') ||
+        lowerMessage.includes('seed') || lowerMessage.includes('agriculture') || lowerMessage.includes('farming')) {
       return { intent: 'crops' };
     }
     
