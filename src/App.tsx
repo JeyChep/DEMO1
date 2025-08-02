@@ -35,6 +35,55 @@ function App() {
   const [showEconomics, setShowEconomics] = useState<boolean>(false);
   const [selectedCounty, setSelectedCounty] = useState<string>('');
   const [selectedSubcounty, setSelectedSubcounty] = useState<string>('');
+  const [isDetectingLocation, setIsDetectingLocation] = useState<boolean>(false);
+
+  // Auto-detect location using browser geolocation
+  const handleAutoDetectLocation = () => {
+    if (!navigator.geolocation) {
+      return;
+    }
+
+    setIsDetectingLocation(true);
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        
+        // Find the closest location in our dataset
+        let closestLocation: ClimateData | null = null;
+        let minDistance = Infinity;
+        
+        climateData.forEach(location => {
+          const distance = Math.sqrt(
+            Math.pow(location.lat - latitude, 2) + 
+            Math.pow(location.lon - longitude, 2)
+          );
+          
+          if (distance < minDistance) {
+            minDistance = distance;
+            closestLocation = location;
+          }
+        });
+        
+        if (closestLocation) {
+          setSelectedLocation(closestLocation);
+          setSelectedCounty(closestLocation.county);
+          setSelectedSubcounty(closestLocation.subcounty);
+        }
+        
+        setIsDetectingLocation(false);
+      },
+      (error) => {
+        console.error('Geolocation error:', error);
+        setIsDetectingLocation(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 30000,
+        maximumAge: 60000
+      }
+    );
+  };
 
   useEffect(() => {
     const loadData = async () => {
@@ -258,6 +307,17 @@ function App() {
               </div>
             </div>
             
+            <div className="flex items-center gap-4">
+              <button
+                onClick={handleAutoDetectLocation}
+                disabled={isDetectingLocation}
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all duration-200 shadow-md"
+              >
+                <Navigation className={`w-4 h-4 ${isDetectingLocation ? 'animate-spin' : ''}`} />
+                {isDetectingLocation ? 'Detecting...' : 'Auto-Detect Location'}
+              </button>
+            </div>
+            
           </div>
         </div>
       </header>
@@ -280,7 +340,17 @@ function App() {
               Get science-based recommendations for crops, livestock, and pasture based on Kenya's agro-ecological zones
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <div className="text-green-100 text-lg">Select your location below to get personalized recommendations</div>
+              <div className="flex flex-col sm:flex-row items-center gap-4">
+                <div className="text-green-100 text-lg">Select your location below to get personalized recommendations</div>
+                <button
+                  onClick={handleAutoDetectLocation}
+                  disabled={isDetectingLocation}
+                  className="flex items-center gap-2 px-6 py-3 bg-white bg-opacity-20 text-white rounded-lg hover:bg-opacity-30 disabled:bg-opacity-10 disabled:cursor-not-allowed transition-all duration-200 backdrop-blur-sm"
+                >
+                  <Navigation className={`w-5 h-5 ${isDetectingLocation ? 'animate-spin' : ''}`} />
+                  {isDetectingLocation ? 'Detecting Your Location...' : 'Auto-Detect My Location'}
+                </button>
+              </div>
             </div>
           </div>
         </div>
