@@ -126,28 +126,37 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
     
     // Crop type intents
     if (lowerMessage.includes('cereal') || lowerMessage.includes('grain')) {
-      return { intent: 'crops', cropType: 'cereal' };
+      return { intent: 'crops', cropType: 'Cereals' };
     }
     if (lowerMessage.includes('legume') || lowerMessage.includes('bean') || lowerMessage.includes('pea') || lowerMessage.includes('pulse')) {
-      return { intent: 'crops', cropType: 'legume' };
+      return { intent: 'crops', cropType: 'Legumes' };
     }
     if (lowerMessage.includes('vegetable') || lowerMessage.includes('veggie')) {
-      return { intent: 'crops', cropType: 'vegetable' };
+      return { intent: 'crops', cropType: 'Vegetables' };
     }
     if (lowerMessage.includes('fruit') || lowerMessage.includes('tree fruit')) {
-      return { intent: 'crops', cropType: 'fruit' };
+      return { intent: 'crops', cropType: 'Fruits' };
     }
     if (lowerMessage.includes('root') || lowerMessage.includes('potato') || lowerMessage.includes('cassava') || lowerMessage.includes('tuber')) {
-      return { intent: 'crops', cropType: 'root' };
+      return { intent: 'crops', cropType: 'Roots and Tubers' };
     }
     if (lowerMessage.includes('cash crop') || lowerMessage.includes('cash') || lowerMessage.includes('coffee') || lowerMessage.includes('tea') || lowerMessage.includes('tobacco')) {
-      return { intent: 'crops', cropType: 'cash' };
+      return { intent: 'crops', cropType: 'Cash Crops' };
     }
     if (lowerMessage.includes('spice') || lowerMessage.includes('herb')) {
-      return { intent: 'crops', cropType: 'spice' };
+      return { intent: 'crops', cropType: 'Spices' };
     }
     if (lowerMessage.includes('oil') || lowerMessage.includes('oilseed')) {
-      return { intent: 'crops', cropType: 'oil' };
+      return { intent: 'crops', cropType: 'Oil Crops' };
+    }
+    if (lowerMessage.includes('medicinal') || lowerMessage.includes('aromatic')) {
+      return { intent: 'crops', cropType: 'Medicinal and Aromatic' };
+    }
+    if (lowerMessage.includes('horticulture') || lowerMessage.includes('horticultural')) {
+      return { intent: 'crops', cropType: 'Horticulture' };
+    }
+    if (lowerMessage.includes('indigenous')) {
+      return { intent: 'crops', cropType: 'Indigenous Vegetables' };
     }
     
     // General crop intent
@@ -184,7 +193,12 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
     // Filter by crop type if specified
     if (cropType) {
       const originalCount = filteredRecs.length;
-      filteredRecs = filteredRecs.filter(rec => rec.crop.Type.toLowerCase() === cropType.toLowerCase());
+      // Try exact match first, then partial match
+      filteredRecs = filteredRecs.filter(rec => 
+        rec.crop.Type === cropType || 
+        rec.crop.Type.toLowerCase().includes(cropType.toLowerCase()) ||
+        cropType.toLowerCase().includes(rec.crop.Type.toLowerCase())
+      );
       
       console.log(`Filtering for crop type "${cropType}": ${originalCount} -> ${filteredRecs.length} crops`);
       console.log('Available crop types in data:', [...new Set(recommendations.map(r => r.crop.Type))]);
