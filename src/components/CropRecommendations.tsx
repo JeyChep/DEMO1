@@ -190,7 +190,7 @@ export const CropRecommendations: React.FC<CropRecommendationsProps> = ({
                           {/* Crop Header - Clickable */}
                           <button
                             onClick={() => toggleCrop(cropKey)}
-                            className="w-full flex items-center justify-between p-4 bg-green-25 hover:bg-green-50 transition-colors border-l-4 border-green-200"
+                            className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
                           >
                             <div className="text-left">
                               <h5 className="text-md font-semibold text-gray-800">{cropName}</h5>
@@ -251,8 +251,7 @@ export const CropRecommendations: React.FC<CropRecommendationsProps> = ({
                     })}
                   </div>
                 )}
-                </div>
-                
+              </div>
             ))}
           </div>
           </>
