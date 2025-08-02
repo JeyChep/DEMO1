@@ -32,7 +32,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: "🌾 Hello! I'm Selector Bot - your crop selection helper! I help farmers find the best crops, livestock, and pasture for any ward in Kenya.\n\n💬 Talk to me like a friend - I understand farmer language:\n• \"What can I grow in Kandara?\"\n• \"Show me maize varieties for my area\"\n• \"Which cows are good for Meru?\"\n• \"I want to plant tomatoes in Nakuru\"\n• \"What grass is good for my animals?\"\n• \"Coffee farming in Kiambu\"\n• \"Beans for Machakos ward\"\n\n🎯 I'm here to help you select the right crops for your farm!",
+      text: "🌾 Hi! I'm Selector Bot — I help you choose the best crops, pasture, or livestock for any ward in Kenya.",
       isUser: false,
       timestamp: new Date()
     }
