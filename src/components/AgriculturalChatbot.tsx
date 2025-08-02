@@ -125,23 +125,29 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
     }
     
     // Crop type intents
-    if (lowerMessage.includes('cereal')) {
+    if (lowerMessage.includes('cereal') || lowerMessage.includes('grain')) {
       return { intent: 'crops', cropType: 'cereal' };
     }
-    if (lowerMessage.includes('legume') || lowerMessage.includes('bean') || lowerMessage.includes('pea')) {
+    if (lowerMessage.includes('legume') || lowerMessage.includes('bean') || lowerMessage.includes('pea') || lowerMessage.includes('pulse')) {
       return { intent: 'crops', cropType: 'legume' };
     }
-    if (lowerMessage.includes('vegetable')) {
+    if (lowerMessage.includes('vegetable') || lowerMessage.includes('veggie')) {
       return { intent: 'crops', cropType: 'vegetable' };
     }
-    if (lowerMessage.includes('fruit')) {
+    if (lowerMessage.includes('fruit') || lowerMessage.includes('tree fruit')) {
       return { intent: 'crops', cropType: 'fruit' };
     }
-    if (lowerMessage.includes('root') || lowerMessage.includes('potato') || lowerMessage.includes('cassava')) {
+    if (lowerMessage.includes('root') || lowerMessage.includes('potato') || lowerMessage.includes('cassava') || lowerMessage.includes('tuber')) {
       return { intent: 'crops', cropType: 'root' };
     }
-    if (lowerMessage.includes('cash crop') || lowerMessage.includes('coffee') || lowerMessage.includes('tea')) {
+    if (lowerMessage.includes('cash crop') || lowerMessage.includes('cash') || lowerMessage.includes('coffee') || lowerMessage.includes('tea') || lowerMessage.includes('tobacco')) {
       return { intent: 'crops', cropType: 'cash' };
+    }
+    if (lowerMessage.includes('spice') || lowerMessage.includes('herb')) {
+      return { intent: 'crops', cropType: 'spice' };
+    }
+    if (lowerMessage.includes('oil') || lowerMessage.includes('oilseed')) {
+      return { intent: 'crops', cropType: 'oil' };
     }
     
     // General crop intent
@@ -177,11 +183,21 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
     
     // Filter by crop type if specified
     if (cropType) {
+      const originalCount = filteredRecs.length;
       filteredRecs = filteredRecs.filter(rec => rec.crop.Type.toLowerCase() === cropType.toLowerCase());
+      
+      console.log(`Filtering for crop type "${cropType}": ${originalCount} -> ${filteredRecs.length} crops`);
+      console.log('Available crop types in data:', [...new Set(recommendations.map(r => r.crop.Type))]);
     }
     
     if (filteredRecs.length === 0) {
-      return `<div class="text-red-600">❌ No ${cropType || 'crops'} found suitable for ${location.ward}</div>`;
+      if (cropType) {
+        // Show available crop types for this location
+        const availableTypes = [...new Set(recommendations.filter(r => r.suitabilityScore >= 60).map(r => r.crop.Type))];
+        return `<div class="text-red-600">❌ No ${cropType} crops found suitable for ${location.ward}</div>
+                <div class="text-gray-600 mt-2">Available crop types in this ward: ${availableTypes.join(', ')}</div>`;
+      }
+      return `<div class="text-red-600">❌ No crops found suitable for ${location.ward}</div>`;
     }
     
     // Group by crop name
