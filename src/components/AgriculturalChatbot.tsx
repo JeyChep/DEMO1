@@ -1,16 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, Send, X, Minimize2, Maximize2, Sprout, MapPin, Lightbulb } from 'lucide-react';
+import { MessageCircle, Send, X, Minimize2, Maximize2, Sprout, MapPin, Lightbulb, Bot } from 'lucide-react';
 import { CropData, ClimateData, LivestockData, PastureData, AEZData } from '../types';
 import { getTopCropRecommendations } from '../utils/cropMatcher';
 import { getLivestockRecommendations, getPastureRecommendations } from '../utils/aezMatcher';
-import { enhanceRecommendationsWithEconomics } from '../utils/costBenefitAnalysis';
 
 interface Message {
   id: string;
   text: string;
   isUser: boolean;
   timestamp: Date;
-  cards?: React.ReactNode[];
+  isHtml?: boolean;
 }
 
 interface AgriculturalChatbotProps {
@@ -33,7 +32,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: "Hello! I'm your KALRO agricultural assistant. I can help you find the best crops, livestock, and pasture for any location in Kenya. Try asking me something like 'What crops can I grow in Kandara ward?' or 'Show me cereals for Nairobi'.",
+      text: "🌾 Hello! I'm your KALRO Agricultural Assistant. I can help you find the best crops, livestock, and pasture for any ward in Kenya.\n\n💬 Try asking me:\n• \"What crops are suitable for Kandara ward?\"\n• \"Show me cereals for Nairobi\"\n• \"What livestock can I keep in Meru?\"\n• \"Dairy cattle breeds for my area\"\n• \"Fodder crops for Nakuru ward\"",
       isUser: false,
       timestamp: new Date()
     }
@@ -50,34 +49,28 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
     scrollToBottom();
   }, [messages]);
 
-  const findLocationByName = (locationName: string): ClimateData | null => {
-    const searchTerm = locationName.toLowerCase().trim();
-    
-    // Extract potential location words from the message
+  // Enhanced location finder with fuzzy matching
+  const findLocationByName = (locationText: string): ClimateData | null => {
+    const searchTerm = locationText.toLowerCase().trim();
     const words = searchTerm.split(/[\s,.-]+/).filter(word => word.length > 2);
     
-    console.log('Searching for location in:', searchTerm);
-    console.log('Search words:', words);
-    console.log('Available locations sample:', climateData.slice(0, 5).map(l => `${l.ward}, ${l.subcounty}, ${l.county}`));
+    console.log('Searching for location:', searchTerm);
     
-    // Priority 1: Exact ward name matches
+    // Priority 1: Exact matches
     for (const location of climateData) {
       const ward = location.ward.toLowerCase();
       const subcounty = location.subcounty.toLowerCase();
       const county = location.county.toLowerCase();
       
-      // Check if any word exactly matches ward, subcounty, or county
-      for (const word of words) {
-        if (ward === word || subcounty === word || county === word) {
-          console.log('Found exact word match:', word, '→', location.ward, location.subcounty, location.county);
-          return location;
-        }
+      if (ward === searchTerm || subcounty === searchTerm || county === searchTerm) {
+        return location;
       }
       
-      // Also check full search term
-      if (ward === searchTerm || subcounty === searchTerm || county === searchTerm) {
-        console.log('Found exact match:', location.ward, location.subcounty, location.county);
-        return location;
+      // Check individual words
+      for (const word of words) {
+        if (ward === word || subcounty === word || county === word) {
+          return location;
+        }
       }
     }
     
@@ -89,40 +82,86 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
       
       for (const word of words) {
         if (ward.includes(word) || subcounty.includes(word) || county.includes(word)) {
-          console.log('Found contains match:', word, '→', location.ward, location.subcounty, location.county);
           return location;
         }
       }
     }
     
-    // Priority 3: Search term contains location name
-    for (const location of climateData) {
-      const ward = location.ward.toLowerCase();
-      const subcounty = location.subcounty.toLowerCase();
-      const county = location.county.toLowerCase();
-      
-      if (searchTerm.includes(ward) || searchTerm.includes(subcounty) || searchTerm.includes(county)) {
-        console.log('Found reverse match:', location.ward, location.subcounty, location.county);
-        return location;
-      }
-    }
-    
-    console.log('No location found for:', searchTerm);
-    console.log('Total locations in database:', climateData.length);
     return null;
   };
 
-  const getCropsByType = (crops: CropData[], type: string): CropData[] => {
-    return crops.filter(crop => crop.Type.toLowerCase() === type.toLowerCase());
+  // Intent classification using keyword matching
+  const classifyIntent = (message: string): { intent: string; cropType?: string } => {
+    const lowerMessage = message.toLowerCase();
+    
+    // Livestock intents
+    if (lowerMessage.includes('livestock') || lowerMessage.includes('animal')) {
+      return { intent: 'livestock' };
+    }
+    if (lowerMessage.includes('cattle') || lowerMessage.includes('cow') || lowerMessage.includes('dairy')) {
+      return { intent: 'livestock', cropType: 'cattle' };
+    }
+    if (lowerMessage.includes('goat') || lowerMessage.includes('sheep')) {
+      return { intent: 'livestock', cropType: 'goat' };
+    }
+    if (lowerMessage.includes('chicken') || lowerMessage.includes('poultry')) {
+      return { intent: 'livestock', cropType: 'poultry' };
+    }
+    
+    // Pasture/fodder intents
+    if (lowerMessage.includes('pasture') || lowerMessage.includes('fodder') || lowerMessage.includes('grass') || lowerMessage.includes('feed')) {
+      return { intent: 'pasture' };
+    }
+    
+    // Crop type intents
+    if (lowerMessage.includes('cereal')) {
+      return { intent: 'crops', cropType: 'cereal' };
+    }
+    if (lowerMessage.includes('legume') || lowerMessage.includes('bean') || lowerMessage.includes('pea')) {
+      return { intent: 'crops', cropType: 'legume' };
+    }
+    if (lowerMessage.includes('vegetable')) {
+      return { intent: 'crops', cropType: 'vegetable' };
+    }
+    if (lowerMessage.includes('fruit')) {
+      return { intent: 'crops', cropType: 'fruit' };
+    }
+    if (lowerMessage.includes('root') || lowerMessage.includes('potato') || lowerMessage.includes('cassava')) {
+      return { intent: 'crops', cropType: 'root' };
+    }
+    if (lowerMessage.includes('cash crop') || lowerMessage.includes('coffee') || lowerMessage.includes('tea')) {
+      return { intent: 'crops', cropType: 'cash' };
+    }
+    
+    // General crop intent
+    if (lowerMessage.includes('crop') || lowerMessage.includes('plant') || lowerMessage.includes('grow') || lowerMessage.includes('farm')) {
+      return { intent: 'crops' };
+    }
+    
+    return { intent: 'general' };
   };
 
-  const generateCropRecommendations = (location: ClimateData, cropType?: string) => {
-    // Use the exact same logic as the main app
+  // Format varieties horizontally
+  const formatVarietiesHorizontally = (varieties: string[]): string => {
+    if (varieties.length <= 5) {
+      return varieties.join(' • ');
+    }
+    
+    // Group into rows of 5
+    const rows: string[] = [];
+    for (let i = 0; i < varieties.length; i += 5) {
+      rows.push(varieties.slice(i, i + 5).join(' • '));
+    }
+    return rows.join('\n');
+  };
+
+  // Generate crop recommendations
+  const generateCropRecommendations = (location: ClimateData, cropType?: string): string => {
     const recommendations = getTopCropRecommendations(cropsData, location, 100);
     let filteredRecs = recommendations.filter(rec => rec.suitabilityScore >= 60);
     
     if (filteredRecs.length === 0 && recommendations.length > 0) {
-      filteredRecs = recommendations.slice(0, 10);
+      filteredRecs = recommendations.slice(0, 15);
     }
     
     // Filter by crop type if specified
@@ -130,333 +169,160 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
       filteredRecs = filteredRecs.filter(rec => rec.crop.Type.toLowerCase() === cropType.toLowerCase());
     }
     
-    return filteredRecs;
-  };
-
-  const createCropCard = (title: string, location: ClimateData, crops: any[], cropType?: string) => {
-    const handleCardClick = () => {
-      const specificRecs = generateCropRecommendations(location, cropType);
-      
-      let responseText = `🌾 ${title} for ${location.ward} Ward\n\n`;
-      responseText += `📍 Location: ${location.ward} Ward, ${location.subcounty} Sub County, ${location.county}\n\n`;
-      
-      if (specificRecs.length > 0) {
-        const groupedCrops: { [key: string]: string[] } = {};
-        
-        specificRecs.forEach(rec => {
-          const cropName = rec.crop.Crop;
-          if (!groupedCrops[cropName]) {
-            groupedCrops[cropName] = [];
-          }
-          groupedCrops[cropName].push(rec.crop.Variety);
-        });
-        
-        Object.entries(groupedCrops).forEach(([cropName, varieties]) => {
-          responseText += `**${cropName}**\n`;
-          varieties.forEach(variety => {
-            responseText += `• ${variety}\n`;
-          });
-          responseText += '\n';
-        });
-        
-        const topCrop = specificRecs[0];
-        responseText += `💡 **Success Tips for ${location.ward} Ward:**\n`;
-        responseText += `• **Top choice:** ${topCrop.crop.Crop} - ${topCrop.crop.Variety}\n`;
-        responseText += `• Visit local agro-dealer for quality seeds\n`;
-        responseText += `• Contact extension officer for guidance\n`;
-        responseText += `• Consider soil testing before planting`;
-      } else {
-        responseText += `❌ No ${cropType || 'crops'} available in our database\n\n`;
-        responseText += `**Suggestions:**\n`;
-        responseText += `• Try other crop types better suited to your area\n`;
-        responseText += `• Improve soil conditions with organic matter\n`;
-        responseText += `• Contact KALRO ${location.county} office for alternatives`;
-      }
-      
-      const newMessage: Message = {
-        id: Date.now().toString(),
-        text: responseText,
-        isUser: false,
-        timestamp: new Date()
-      };
-      
-      setMessages(prev => [...prev, newMessage]);
-    };
-
-    return (
-      <div 
-        key={title}
-        onClick={handleCardClick}
-        className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4 cursor-pointer hover:shadow-md transition-all duration-200 hover:from-green-100 hover:to-emerald-100"
-      >
-        <div className="flex items-center gap-2 mb-2">
-          <Sprout className="w-5 h-5 text-green-600" />
-          <h4 className="font-semibold text-green-800">{title}</h4>
-        </div>
-        <p className="text-sm text-green-700">
-          {crops.length} varieties available
-        </p>
-        <p className="text-xs text-green-600 mt-1">Click to see details</p>
-      </div>
-    );
-  };
-
-  // Simple similarity check for fuzzy matching
-  const isSimular = (word1: string, word2: string): boolean => {
-    if (Math.abs(word1.length - word2.length) > 2) return false;
-    
-    // Check if one contains most of the other
-    const longer = word1.length > word2.length ? word1 : word2;
-    const shorter = word1.length <= word2.length ? word1 : word2;
-    
-    if (longer.includes(shorter) && shorter.length > 3) return true;
-    
-    // Simple character overlap check
-    let matches = 0;
-    for (let i = 0; i < shorter.length; i++) {
-      if (longer.includes(shorter[i])) matches++;
+    if (filteredRecs.length === 0) {
+      return `<div class="text-red-600">❌ No ${cropType || 'crops'} found suitable for ${location.ward} Ward</div>`;
     }
     
-    return matches / shorter.length > 0.7; // 70% character overlap
+    // Group by crop name
+    const groupedCrops: { [key: string]: string[] } = {};
+    filteredRecs.forEach(rec => {
+      const cropName = rec.crop.Crop;
+      if (!groupedCrops[cropName]) {
+        groupedCrops[cropName] = [];
+      }
+      groupedCrops[cropName].push(rec.crop.Variety);
+    });
+    
+    let response = `<div class="font-bold text-green-600 text-lg mb-3">🌾 ${cropType ? cropType.charAt(0).toUpperCase() + cropType.slice(1) + ' Crops' : 'Suitable Crops'} for ${location.ward} Ward</div>`;
+    response += `<div class="text-green-700 mb-4">📍 ${location.ward} Ward, ${location.subcounty}, ${location.county}</div>`;
+    
+    Object.entries(groupedCrops).forEach(([cropName, varieties]) => {
+      response += `<div class="mb-3">`;
+      response += `<div class="font-semibold text-gray-800 mb-1">${cropName}:</div>`;
+      response += `<div class="text-gray-700 text-sm">${formatVarietiesHorizontally(varieties)}</div>`;
+      response += `</div>`;
+    });
+    
+    const topCrop = filteredRecs[0];
+    response += `<div class="mt-4 p-3 bg-green-50 rounded-lg">`;
+    response += `<div class="text-green-800 font-medium">💡 Top Recommendation: ${topCrop.crop.Crop} - ${topCrop.crop.Variety}</div>`;
+    response += `<div class="text-green-700 text-sm mt-1">Suitability: ${topCrop.suitabilityScore}%</div>`;
+    response += `</div>`;
+    
+    return response;
   };
 
+  // Generate livestock recommendations
+  const generateLivestockRecommendations = (location: ClimateData, livestockType?: string): string => {
+    const recommendations = getLivestockRecommendations(livestockData, location, aezData);
+    
+    let filteredRecs = recommendations;
+    if (livestockType) {
+      filteredRecs = recommendations.filter(rec => 
+        rec.livestock.Livestock.toLowerCase().includes(livestockType.toLowerCase())
+      );
+    }
+    
+    if (filteredRecs.length === 0) {
+      return `<div class="text-red-600">❌ No ${livestockType || 'livestock'} breeds found suitable for ${location.ward} Ward</div>`;
+    }
+    
+    // Group by livestock type
+    const groupedLivestock: { [key: string]: string[] } = {};
+    filteredRecs.forEach(rec => {
+      const type = rec.livestock.Livestock;
+      if (!groupedLivestock[type]) {
+        groupedLivestock[type] = [];
+      }
+      groupedLivestock[type].push(rec.livestock.Breed);
+    });
+    
+    let response = `<div class="font-bold text-green-600 text-lg mb-3">🐄 ${livestockType ? livestockType.charAt(0).toUpperCase() + livestockType.slice(1) : 'Suitable Livestock'} for ${location.ward} Ward</div>`;
+    response += `<div class="text-green-700 mb-4">📍 ${location.ward} Ward, ${location.subcounty}, ${location.county}</div>`;
+    
+    Object.entries(groupedLivestock).forEach(([type, breeds]) => {
+      response += `<div class="mb-3">`;
+      response += `<div class="font-semibold text-gray-800 mb-1">${type}:</div>`;
+      response += `<div class="text-gray-700 text-sm">${formatVarietiesHorizontally(breeds)}</div>`;
+      response += `</div>`;
+    });
+    
+    response += `<div class="mt-4 p-3 bg-blue-50 rounded-lg">`;
+    response += `<div class="text-blue-800 font-medium">💡 All breeds shown are suitable for your agro-ecological zone</div>`;
+    response += `</div>`;
+    
+    return response;
+  };
+
+  // Generate pasture recommendations
+  const generatePastureRecommendations = (location: ClimateData): string => {
+    const recommendations = getPastureRecommendations(pastureData, location, aezData);
+    
+    if (recommendations.length === 0) {
+      return `<div class="text-red-600">❌ No pasture varieties found suitable for ${location.ward} Ward</div>`;
+    }
+    
+    // Group by pasture type
+    const groupedPasture: { [key: string]: string[] } = {};
+    recommendations.forEach(rec => {
+      const type = rec.pasture['Pasture/fodder'];
+      if (!groupedPasture[type]) {
+        groupedPasture[type] = [];
+      }
+      groupedPasture[type].push(rec.pasture.Variety);
+    });
+    
+    let response = `<div class="font-bold text-green-600 text-lg mb-3">🌾 Suitable Pasture & Fodder for ${location.ward} Ward</div>`;
+    response += `<div class="text-green-700 mb-4">📍 ${location.ward} Ward, ${location.subcounty}, ${location.county}</div>`;
+    
+    Object.entries(groupedPasture).forEach(([type, varieties]) => {
+      response += `<div class="mb-3">`;
+      response += `<div class="font-semibold text-gray-800 mb-1">${type}:</div>`;
+      response += `<div class="text-gray-700 text-sm">${formatVarietiesHorizontally(varieties)}</div>`;
+      response += `</div>`;
+    });
+    
+    response += `<div class="mt-4 p-3 bg-amber-50 rounded-lg">`;
+    response += `<div class="text-amber-800 font-medium">💡 All varieties shown are suitable for your agro-ecological zone</div>`;
+    response += `</div>`;
+    
+    return response;
+  };
+
+  // Main message processing function
   const processMessage = async (message: string) => {
     setIsTyping(true);
     
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    const lowerMessage = message.toLowerCase();
+    const location = findLocationByName(message);
+    const { intent, cropType } = classifyIntent(message);
+    
     let response = '';
-    let cards: React.ReactNode[] = [];
+    let isHtml = false;
     
-    // Extract location from message
-    const locationMatch = findLocationByName(message);
-    
-    if (locationMatch) {
-      // Check what type of recommendation is requested
-      if (lowerMessage.includes('livestock') || lowerMessage.includes('cattle') || lowerMessage.includes('goat') || lowerMessage.includes('sheep') || lowerMessage.includes('chicken') || lowerMessage.includes('poultry')) {
-        // LIVESTOCK RECOMMENDATIONS
-        // Use the exact same logic as the livestock tab
-        const livestockRecs = getLivestockRecommendations(livestockData, locationMatch, aezData);
-        
-        response = `🐄 Livestock Recommendations for ${locationMatch.ward} Ward\n\n`;
-        response += `📍 Location: ${locationMatch.ward} Ward, ${locationMatch.subcounty} Sub County, ${locationMatch.county}\n\n`;
-        
-        if (livestockRecs.length > 0) {
-          const groupedLivestock: { [key: string]: string[] } = {};
-          
-          livestockRecs.forEach(rec => {
-            const type = rec.livestock.Livestock;
-            if (!groupedLivestock[type]) {
-              groupedLivestock[type] = [];
-            }
-            groupedLivestock[type].push(rec.livestock.Breed);
-          });
-          
-          Object.entries(groupedLivestock).forEach(([type, breeds]) => {
-            response += `**${type}**\n`;
-            breeds.forEach(breed => {
-              response += `• ${breed}\n`;
-            });
-            response += '\n';
-          });
-          
-          response += `💡 **Success Tips for ${locationMatch.ward} Ward:**\n`;
-          response += `• **AEZ Match:** These breeds are suitable for your agro-ecological zone\n`;
-          response += `• Visit local livestock extension officer for guidance\n`;
-          response += `• Consider local market demand\n`;
-          response += `• Ensure proper housing and feeding`;
-        } else {
-          response += `❌ No livestock breeds available for your AEZ\n\n`;
-          response += `**Suggestions:**\n`;
-          response += `• Contact KALRO ${locationMatch.county} office for alternatives\n`;
-          response += `• Consider improving local conditions\n`;
-          response += `• Look into emerging livestock options`;
-        }
-      } else if (lowerMessage.includes('pasture') || lowerMessage.includes('fodder') || lowerMessage.includes('grass') || lowerMessage.includes('feed')) {
-        // PASTURE RECOMMENDATIONS
-        // Use the exact same logic as the pasture tab
-        const pastureRecs = getPastureRecommendations(pastureData, locationMatch, aezData);
-        
-        response = `🌾 Pasture & Fodder Recommendations for ${locationMatch.ward} Ward\n\n`;
-        response += `📍 Location: ${locationMatch.ward} Ward, ${locationMatch.subcounty} Sub County, ${locationMatch.county}\n\n`;
-        
-        if (pastureRecs.length > 0) {
-          const groupedPasture: { [key: string]: string[] } = {};
-          
-          pastureRecs.forEach(rec => {
-            const type = rec.pasture['Pasture/fodder'];
-            if (!groupedPasture[type]) {
-              groupedPasture[type] = [];
-            }
-            groupedPasture[type].push(rec.pasture.Variety);
-          });
-          
-          Object.entries(groupedPasture).forEach(([type, varieties]) => {
-            response += `**${type}**\n`;
-            varieties.forEach(variety => {
-              response += `• ${variety}\n`;
-            });
-            response += '\n';
-          });
-          
-          response += `💡 **Success Tips for ${locationMatch.ward} Ward:**\n`;
-          response += `• **AEZ Match:** These varieties are suitable for your agro-ecological zone\n`;
-          response += `• Consider mixed pasture systems\n`;
-          response += `• Plan for seasonal variations\n`;
-          response += `• Ensure proper grazing management`;
-        } else {
-          response += `❌ No pasture varieties available for your AEZ\n\n`;
-          response += `**Suggestions:**\n`;
-          response += `• Contact KALRO ${locationMatch.county} office for alternatives\n`;
-          response += `• Consider improving soil conditions\n`;
-          response += `• Look into drought-resistant varieties`;
-        }
-      } else if (lowerMessage.includes('cereal')) {
-        // SPECIFIC CEREAL CROPS
-        const cerealCrops = getCropsByType(cropsData, 'Cereal');
-        const cerealRecs = generateCropRecommendations(locationMatch, 'cereal');
-        
-        response = `🌾 Cereal Crops for ${locationMatch.ward} Ward\n\n`;
-        response += `📍 Location: ${locationMatch.ward} Ward, ${locationMatch.subcounty} Sub County, ${locationMatch.county}\n\n`;
-        
-        if (cerealRecs.length > 0) {
-          const groupedCrops: { [key: string]: string[] } = {};
-          
-          cerealRecs.forEach(rec => {
-            const cropName = rec.crop.Crop;
-            if (!groupedCrops[cropName]) {
-              groupedCrops[cropName] = [];
-            }
-            groupedCrops[cropName].push(rec.crop.Variety);
-          });
-          
-          Object.entries(groupedCrops).forEach(([cropName, varieties]) => {
-            response += `**${cropName}**\n`;
-            varieties.forEach(variety => {
-              response += `• ${variety}\n`;
-            });
-            response += '\n';
-          });
-          
-          const topCrop = cerealRecs[0];
-          response += `💡 **Success Tips for ${locationMatch.ward} Ward:**\n`;
-          response += `• **Top choice:** ${topCrop.crop.Crop} - ${topCrop.crop.Variety}\n`;
-          response += `• Visit local agro-dealer for quality seeds\n`;
-          response += `• Contact extension officer for guidance\n`;
-          response += `• Consider soil testing before planting`;
-        } else {
-          response += `❌ No Cereal crops available in our database\n\n`;
-          response += `**Suggestions:**\n`;
-          response += `• Try other crop types better suited to your area\n`;
-          response += `• Improve soil conditions with organic matter\n`;
-          response += `• Contact KALRO ${locationMatch.county} office for alternatives`;
-        }
-      } else if (lowerMessage.includes('legume')) {
-        // SPECIFIC LEGUME CROPS
-        const legumeCrops = getCropsByType(cropsData, 'Legume');
-        const legumeRecs = generateCropRecommendations(locationMatch, 'legume');
-        
-        response = `🌱 Legume Crops for ${locationMatch.ward} Ward\n\n`;
-        response += `📍 Location: ${locationMatch.ward} Ward, ${locationMatch.subcounty} Sub County, ${locationMatch.county}\n\n`;
-        
-        if (legumeRecs.length > 0) {
-          const groupedCrops: { [key: string]: string[] } = {};
-          
-          legumeRecs.forEach(rec => {
-            const cropName = rec.crop.Crop;
-            if (!groupedCrops[cropName]) {
-              groupedCrops[cropName] = [];
-            }
-            groupedCrops[cropName].push(rec.crop.Variety);
-          });
-          
-          Object.entries(groupedCrops).forEach(([cropName, varieties]) => {
-            response += `**${cropName}**\n`;
-            varieties.forEach(variety => {
-              response += `• ${variety}\n`;
-            });
-            response += '\n';
-          });
-          
-          const topCrop = legumeRecs[0];
-          response += `💡 **Success Tips for ${locationMatch.ward} Ward:**\n`;
-          response += `• **Top choice:** ${topCrop.crop.Crop} - ${topCrop.crop.Variety}\n`;
-          response += `• Visit local agro-dealer for quality seeds\n`;
-          response += `• Contact extension officer for guidance\n`;
-          response += `• Consider soil testing before planting`;
-        } else {
-          response += `❌ No Legume crops available in our database\n\n`;
-          response += `**Suggestions:**\n`;
-          response += `• Try other crop types better suited to your area\n`;
-          response += `• Improve soil conditions with organic matter\n`;
-          response += `• Contact KALRO ${locationMatch.county} office for alternatives`;
-        }
-      } else if (lowerMessage.includes('vegetable')) {
-        // SPECIFIC VEGETABLE CROPS
-        const vegetableCrops = getCropsByType(cropsData, 'Vegetable');
-        const vegetableRecs = generateCropRecommendations(locationMatch, 'vegetable');
-        
-        response = `🥬 Vegetable Crops for ${locationMatch.ward} Ward\n\n`;
-        response += `📍 Location: ${locationMatch.ward} Ward, ${locationMatch.subcounty} Sub County, ${locationMatch.county}\n\n`;
-        
-        if (vegetableRecs.length > 0) {
-          const groupedCrops: { [key: string]: string[] } = {};
-          
-          vegetableRecs.forEach(rec => {
-            const cropName = rec.crop.Crop;
-            if (!groupedCrops[cropName]) {
-              groupedCrops[cropName] = [];
-            }
-            groupedCrops[cropName].push(rec.crop.Variety);
-          });
-          
-          Object.entries(groupedCrops).forEach(([cropName, varieties]) => {
-            response += `${cropName}\n`;
-            varieties.forEach(variety => {
-              response += `• ${variety}\n`;
-            });
-            response += '\n';
-          });
-          
-          const topCrop = vegetableRecs[0];
-          response += `💡 Success Tips for ${locationMatch.ward} Ward:\n`;
-          response += `• Top choice: ${topCrop.crop.Crop} - ${topCrop.crop.Variety}\n`;
-          response += `• Visit local agro-dealer for quality seeds\n`;
-          response += `• Contact extension officer for guidance\n`;
-          response += `• Consider soil testing before planting`;
-        } else {
-          response += `❌ No Vegetable crops available in our database\n\n`;
-          response += `Suggestions:\n`;
-          response += `• Try other crop types better suited to your area\n`;
-          response += `• Improve soil conditions with organic matter\n`;
-          response += `• Contact KALRO ${locationMatch.county} office for alternatives`;
-        }
-        response += `Click on a crop type below to see all available varieties:\n\n`;
-        
-        // Create clickable cards for different crop types
-        const cropTypes = ['Cereal', 'Legume', 'Vegetable', 'Root', 'Fruit', 'Cash', 'Spice', 'Oil'];
-        cropTypes.forEach(type => {
-          const typeCrops = cropsData.filter(crop => crop.Type.toLowerCase() === type.toLowerCase());
-          if (typeCrops.length > 0) {
-            cards.push(createCropCard(`${type} Crops`, locationMatch, typeCrops, type.toLowerCase()));
-          }
-        });
-      }
-    } else {
-      // No location found
-      response = `I couldn't find that location in our database. 📍\n\n`;
+    if (!location) {
+      response = `🔍 I couldn't find that location in our database.\n\n`;
       response += `I have data for ${climateData.length} wards across Kenya.\n\n`;
       response += `Please try:\n`;
-      response += `• Ward name: "crops in kamagut ward"\n`;
-      response += `• County name: "crops for Murang'a"\n`;
-      response += `• Subcounty name: "livestock for Kandara"\n\n`;
-      response += `Examples that work:\n`;
-      response += `• "crops in Nairobi"\n`;
-      response += `• "livestock for Meru"\n`;
-      response += `• "pasture in Kisumu"\n`;
-      response += `• "cereals for Nakuru"\n\n`;
-      response += `Try a different spelling or a nearby location! 🌾`;
+      response += `• "What crops are suitable for Kandara ward?"\n`;
+      response += `• "Show me livestock for Meru county"\n`;
+      response += `• "Cereals for Nairobi"\n\n`;
+      response += `Make sure to include the ward, subcounty, or county name! 🌾`;
+    } else {
+      isHtml = true;
+      
+      switch (intent) {
+        case 'livestock':
+          response = generateLivestockRecommendations(location, cropType);
+          break;
+        case 'pasture':
+          response = generatePastureRecommendations(location);
+          break;
+        case 'crops':
+          response = generateCropRecommendations(location, cropType);
+          break;
+        default:
+          // General response with all categories
+          response = `<div class="space-y-4">`;
+          response += generateCropRecommendations(location);
+          response += `<hr class="my-4">`;
+          response += generateLivestockRecommendations(location);
+          response += `<hr class="my-4">`;
+          response += generatePastureRecommendations(location);
+          response += `</div>`;
+          break;
+      }
     }
     
     setIsTyping(false);
@@ -466,7 +332,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
       text: response,
       isUser: false,
       timestamp: new Date(),
-      cards: cards.length > 0 ? cards : undefined
+      isHtml
     };
     
     setMessages(prev => [...prev, newMessage]);
@@ -495,33 +361,6 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
     }
   };
 
-  const formatMessageText = (text: string) => {
-    return text.split('\n').map((line, index) => {
-      if (line.startsWith('**') && line.endsWith('**')) {
-        return <div key={index} className="font-bold text-gray-800 mt-2 mb-1">{line.slice(2, -2)}</div>;
-      }
-      if (line.startsWith('• ')) {
-        return <div key={index} className="ml-4 text-gray-700">{line}</div>;
-      }
-      if (line.startsWith('🌾') || line.startsWith('🌱') || line.startsWith('🥬')) {
-        return <div key={index} className="font-bold text-lg text-green-700 mb-2">{line}</div>;
-      }
-      if (line.startsWith('📍')) {
-        return <div key={index} className="text-green-600 font-medium mb-2">{line}</div>;
-      }
-      if (line.startsWith('🏆')) {
-        return <div key={index} className="font-semibold text-orange-600 mb-2">{line}</div>;
-      }
-      if (line.startsWith('💡')) {
-        return <div key={index} className="font-semibold text-blue-600 mb-1">{line}</div>;
-      }
-      if (line.startsWith('❌')) {
-        return <div key={index} className="text-red-600 font-medium mb-2">{line}</div>;
-      }
-      return <div key={index} className="text-gray-700">{line}</div>;
-    });
-  };
-
   if (!isOpen) {
     return (
       <button
@@ -541,7 +380,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
       <div className="bg-green-600 text-white p-4 rounded-t-xl flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-            <Sprout className="w-5 h-5" />
+            <Bot className="w-5 h-5" />
           </div>
           <div>
             <h3 className="font-semibold">KALRO Assistant</h3>
@@ -576,13 +415,14 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
                     : 'bg-gray-100 text-gray-800'
                 }`}>
                   <div className="text-sm leading-relaxed">
-                    {formatMessageText(message.text)}
+                    {message.isHtml ? (
+                      <div dangerouslySetInnerHTML={{ __html: message.text }} />
+                    ) : (
+                      message.text.split('\n').map((line, index) => (
+                        <div key={index}>{line}</div>
+                      ))
+                    )}
                   </div>
-                  {message.cards && (
-                    <div className="mt-3 space-y-2">
-                      {message.cards}
-                    </div>
-                  )}
                   <div className={`text-xs mt-2 ${message.isUser ? 'text-green-100' : 'text-gray-500'}`}>
                     {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </div>
@@ -615,7 +455,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Ask about crops for your location..."
+                placeholder="Ask about crops for your ward..."
                 className="flex-1 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
                 disabled={isTyping}
               />
