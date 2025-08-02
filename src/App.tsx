@@ -36,6 +36,7 @@ function App() {
   const [selectedCounty, setSelectedCounty] = useState<string>('');
   const [selectedSubcounty, setSelectedSubcounty] = useState<string>('');
   const [isDetectingLocation, setIsDetectingLocation] = useState<boolean>(false);
+  const [detectedCoordinates, setDetectedCoordinates] = useState<{lat: number, lon: number} | null>(null);
 
   // Auto-detect location using browser geolocation
   const handleAutoDetectLocation = () => {
@@ -48,6 +49,9 @@ function App() {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
+        
+        // Store the detected coordinates
+        setDetectedCoordinates({ lat: latitude, lon: longitude });
         
         // Find the closest location in our dataset
         let closestLocation: ClimateData | null = null;
@@ -345,6 +349,19 @@ function App() {
                 </button>
               </div>
             </div>
+            
+            {/* Show detected coordinates */}
+            {detectedCoordinates && (
+              <div className="mt-6 bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4 max-w-md mx-auto">
+                <div className="text-green-100 text-sm mb-2">📍 Detected GPS Coordinates:</div>
+                <div className="text-white font-mono text-lg">
+                  {detectedCoordinates.lat.toFixed(6)}, {detectedCoordinates.lon.toFixed(6)}
+                </div>
+                <div className="text-green-200 text-xs mt-2">
+                  Latitude: {detectedCoordinates.lat.toFixed(6)} • Longitude: {detectedCoordinates.lon.toFixed(6)}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
