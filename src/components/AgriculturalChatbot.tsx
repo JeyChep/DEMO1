@@ -441,12 +441,20 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
 
   if (!isOpen) {
     return (
-      <button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 w-16 h-16 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110 z-50"
-      >
-        <MessageCircle className="w-8 h-8" />
-      </button>
+      <div className="fixed bottom-6 right-6 z-50">
+        <button
+          onClick={() => setIsOpen(true)}
+          className="group flex items-center gap-3 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-lg transition-all duration-200 hover:scale-105 p-4"
+        >
+          <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+            <MessageCircle className="w-6 h-6" />
+          </div>
+          <div className="text-left pr-2">
+            <div className="font-bold text-lg">Selector Bot</div>
+            <div className="text-xs text-green-100">Ask me about crops!</div>
+          </div>
+        </button>
+      </div>
     );
   }
 
