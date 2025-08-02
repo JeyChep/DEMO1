@@ -52,9 +52,11 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
   // Enhanced location finder with fuzzy matching
   const findLocationByName = (locationText: string): ClimateData | null => {
     const searchTerm = locationText.toLowerCase().trim();
-    const words = searchTerm.split(/[\s,.-]+/).filter(word => word.length > 2);
+    // Remove common words like "ward", "county", "subcounty" from search
+    const cleanedTerm = searchTerm.replace(/\b(ward|county|subcounty)\b/g, '').trim();
+    const words = cleanedTerm.split(/[\s,.-]+/).filter(word => word.length > 2);
     
-    console.log('Searching for location:', searchTerm, 'in', climateData.length, 'wards');
+    console.log('Searching for location:', searchTerm, 'cleaned:', cleanedTerm, 'words:', words);
     
     // Priority 1: Exact matches
     for (const location of climateData) {
@@ -62,7 +64,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
       const subcounty = location.subcounty.toLowerCase();
       const county = location.county.toLowerCase();
       
-      if (ward === searchTerm || subcounty === searchTerm || county === searchTerm) {
+      if (ward === cleanedTerm || subcounty === cleanedTerm || county === cleanedTerm) {
         console.log('Found exact match:', location.ward, location.subcounty, location.county);
         return location;
       }
@@ -174,7 +176,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
     }
     
     if (filteredRecs.length === 0) {
-      return `<div class="text-red-600">❌ No ${cropType || 'crops'} found suitable for ${location.ward} Ward</div>`;
+      return `<div class="text-red-600">❌ No ${cropType || 'crops'} found suitable for ${location.ward}</div>`;
     }
     
     // Group by crop name
@@ -187,7 +189,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
       groupedCrops[cropName].push(rec.crop.Variety);
     });
     
-    let response = `<div class="font-bold text-green-600 text-lg mb-3">🌾 ${cropType ? cropType.charAt(0).toUpperCase() + cropType.slice(1) + ' Crops' : 'Suitable Crops'} for ${location.ward} Ward</div>`;
+    let response = `<div class="font-bold text-green-600 text-lg mb-3">🌾 ${cropType ? cropType.charAt(0).toUpperCase() + cropType.slice(1) + ' Crops' : 'Suitable Crops'} for ${location.ward}</div>`;
     response += `<div class="text-green-700 mb-4">📍 ${location.ward} Ward, ${location.subcounty}, ${location.county}</div>`;
     
     Object.entries(groupedCrops).forEach(([cropName, varieties]) => {
@@ -218,7 +220,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
     }
     
     if (filteredRecs.length === 0) {
-      return `<div class="text-red-600">❌ No ${livestockType || 'livestock'} breeds found suitable for ${location.ward} Ward</div>`;
+      return `<div class="text-red-600">❌ No ${livestockType || 'livestock'} breeds found suitable for ${location.ward}</div>`;
     }
     
     // Group by livestock type
@@ -231,7 +233,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
       groupedLivestock[type].push(rec.livestock.Breed);
     });
     
-    let response = `<div class="font-bold text-green-600 text-lg mb-3">🐄 ${livestockType ? livestockType.charAt(0).toUpperCase() + livestockType.slice(1) : 'Suitable Livestock'} for ${location.ward} Ward</div>`;
+    let response = `<div class="font-bold text-green-600 text-lg mb-3">🐄 ${livestockType ? livestockType.charAt(0).toUpperCase() + livestockType.slice(1) : 'Suitable Livestock'} for ${location.ward}</div>`;
     response += `<div class="text-green-700 mb-4">📍 ${location.ward} Ward, ${location.subcounty}, ${location.county}</div>`;
     
     Object.entries(groupedLivestock).forEach(([type, breeds]) => {
@@ -253,7 +255,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
     const recommendations = getPastureRecommendations(pastureData, location, aezData);
     
     if (recommendations.length === 0) {
-      return `<div class="text-red-600">❌ No pasture varieties found suitable for ${location.ward} Ward</div>`;
+      return `<div class="text-red-600">❌ No pasture varieties found suitable for ${location.ward}</div>`;
     }
     
     // Group by pasture type
@@ -266,7 +268,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
       groupedPasture[type].push(rec.pasture.Variety);
     });
     
-    let response = `<div class="font-bold text-green-600 text-lg mb-3">🌾 Suitable Pasture & Fodder for ${location.ward} Ward</div>`;
+    let response = `<div class="font-bold text-green-600 text-lg mb-3">🌾 Suitable Pasture & Fodder for ${location.ward}</div>`;
     response += `<div class="text-green-700 mb-4">📍 ${location.ward} Ward, ${location.subcounty}, ${location.county}</div>`;
     
     Object.entries(groupedPasture).forEach(([type, varieties]) => {
