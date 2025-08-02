@@ -30,12 +30,12 @@ export const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, onTabCh
               className={`
                 flex-1 min-w-0 flex items-center justify-center gap-2 py-4 px-3 font-semibold transition-all duration-200
                 ${isActive 
-                  ? 'bg-green-600 text-white shadow-lg' 
-                  : 'text-gray-600 hover:text-green-700 hover:bg-green-50'
+                  ? 'bg-green-600 text-white shadow-lg transform scale-105' 
+                  : 'text-green-700 hover:text-green-800 hover:bg-green-50 hover:shadow-md'
                 }
                 ${isFirst ? 'rounded-l-xl' : ''}
                 ${isLast ? 'rounded-r-xl' : ''}
-                ${!isActive && !isFirst ? 'border-l border-green-200' : ''}
+                ${!isActive && !isFirst ? 'border-l border-green-100' : ''}
               `}
             >
               <Icon className="w-4 h-4 md:w-5 md:h-5" />

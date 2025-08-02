@@ -241,7 +241,7 @@ export const CropRecommendations: React.FC<CropRecommendationsProps> = ({
                                         )}
                                       </div>
                                     )}
-                                  </div>
+                      className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 transition-all duration-200"
                                 );
                               })}
                             </div>
