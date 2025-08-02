@@ -53,15 +53,24 @@ function App() {
         // Store the detected coordinates
         setDetectedCoordinates({ lat: latitude, lon: longitude });
         
-        // Find the closest location in our dataset
+        // Find the closest location in our dataset using improved algorithm
         let closestLocation: ClimateData | null = null;
         let minDistance = Infinity;
+        const candidates: Array<{location: ClimateData, distance: number}> = [];
         
         climateData.forEach(location => {
-          const distance = Math.sqrt(
-            Math.pow(location.lat - latitude, 2) + 
-            Math.pow(location.lon - longitude, 2)
-          );
+          // Use Haversine formula for more accurate distance calculation
+          const R = 6371; // Earth's radius in kilometers
+          const dLat = (location.lat - latitude) * Math.PI / 180;
+          const dLon = (location.lon - longitude) * Math.PI / 180;
+          const a = 
+            Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(latitude * Math.PI / 180) * Math.cos(location.lat * Math.PI / 180) * 
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+          const distance = R * c; // Distance in kilometers
+          
+          candidates.push({ location, distance });
           
           if (distance < minDistance) {
             minDistance = distance;
@@ -69,7 +78,16 @@ function App() {
           }
         });
         
+        // Sort candidates by distance and log top 5 for debugging
+        candidates.sort((a, b) => a.distance - b.distance);
+        console.log('GPS Location:', latitude, longitude);
+        console.log('Top 5 closest wards:');
+        candidates.slice(0, 5).forEach((candidate, index) => {
+          console.log(`${index + 1}. ${candidate.location.ward}, ${candidate.location.subcounty}, ${candidate.location.county} - ${candidate.distance.toFixed(2)}km`);
+        });
+        
         if (closestLocation) {
+          console.log(`Selected: ${closestLocation.ward}, ${closestLocation.subcounty}, ${closestLocation.county} - ${minDistance.toFixed(2)}km away`);
           setSelectedLocation(closestLocation);
           setSelectedCounty(closestLocation.county);
           setSelectedSubcounty(closestLocation.subcounty);
@@ -83,7 +101,7 @@ function App() {
       },
       {
         enableHighAccuracy: true,
-        timeout: 30000,
+        timeout: 15000,
         maximumAge: 60000
       }
     );
@@ -360,6 +378,17 @@ function App() {
                 <div className="text-green-200 text-xs mt-2">
                   Latitude: {detectedCoordinates.lat.toFixed(6)} • Longitude: {detectedCoordinates.lon.toFixed(6)}
                 </div>
+                {selectedLocation && (
+                  <div className="mt-3 pt-3 border-t border-white border-opacity-30">
+                    <div className="text-green-100 text-sm mb-1">🎯 Matched Ward:</div>
+                    <div className="text-white text-sm font-medium">
+                      {selectedLocation.ward}, {selectedLocation.subcounty}
+                    </div>
+                    <div className="text-green-200 text-xs mt-1">
+                      Ward coordinates: {selectedLocation.lat.toFixed(6)}, {selectedLocation.lon.toFixed(6)}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
