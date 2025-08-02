@@ -213,13 +213,15 @@ function App() {
 
     const options = {
       enableHighAccuracy: true,
-      timeout: 15000,
-      maximumAge: 300000 // 5 minutes
+      timeout: 30000, // Increased timeout for better accuracy
+      maximumAge: 60000 // 1 minute - fresher location data
     };
 
+    setLocationError('🔍 Detecting your location... This may take a moment for better accuracy.');
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
+        const accuracy = position.coords.accuracy;
         setUserLocation({ lat: latitude, lon: longitude });
         
         if (climateData.length === 0) {
@@ -227,41 +229,70 @@ function App() {
           return;
         }
         
-        // Find closest ward based on coordinates using Haversine formula
+        // Find closest ward with improved algorithm
         let closest = climateData[0];
         let minDistance = calculateDistance(latitude, longitude, closest.lat, closest.lon);
+        let alternativeOptions: { ward: ClimateData; distance: number }[] = [];
         
         climateData.forEach(ward => {
           const distance = calculateDistance(latitude, longitude, ward.lat, ward.lon);
           if (distance < minDistance) {
+            // Keep track of previous closest as alternative
+            if (minDistance < 50) { // Only if reasonably close
+              alternativeOptions.push({ ward: closest, distance: minDistance });
+            }
             minDistance = distance;
             closest = ward;
+          } else if (distance < 50 && alternativeOptions.length < 3) {
+            // Keep track of other nearby options
+            alternativeOptions.push({ ward, distance });
           }
         });
         
+        // Sort alternatives by distance
+        alternativeOptions.sort((a, b) => a.distance - b.distance);
+        
+        console.log(`GPS Accuracy: ${accuracy}m`);
         console.log(`Found closest location: ${closest.ward}, ${closest.subcounty}, ${closest.county} (${minDistance.toFixed(2)}km away)`);
+        console.log('Alternative nearby locations:', alternativeOptions.slice(0, 3));
+        
         setSelectedLocation(closest);
         
         // Auto-fill the location selector dropdowns
         setSelectedCounty(closest.county);
         setSelectedSubcounty(closest.subcounty);
         
-        setLocationError('');
+        // Provide feedback about detection accuracy
+        if (minDistance > 20) {
+          setLocationError(`📍 Location detected: ${closest.ward}, ${closest.subcounty}, ${closest.county} (${minDistance.toFixed(1)}km away). If this seems incorrect, please select manually below.`);
+        } else if (minDistance > 10) {
+          setLocationError(`📍 Location detected: ${closest.ward}, ${closest.subcounty}, ${closest.county} (${minDistance.toFixed(1)}km away). This looks good!`);
+        } else {
+          setLocationError(`✅ Location detected: ${closest.ward}, ${closest.subcounty}, ${closest.county}. Great accuracy!`);
+        }
+        
+        // Show alternatives if main detection might be off
+        if (minDistance > 15 && alternativeOptions.length > 0) {
+          const altText = alternativeOptions.slice(0, 2).map(alt => 
+            `${alt.ward.ward} (${alt.distance.toFixed(1)}km)`
+          ).join(', ');
+          setLocationError(prev => prev + ` Nearby alternatives: ${altText}`);
+        }
       },
       (error) => {
         console.error('Geolocation error:', error);
         switch(error.code) {
           case error.PERMISSION_DENIED:
-            setLocationError('Location access denied. Please enable location permissions and try again.');
+            setLocationError('❌ Location access denied. Please enable location permissions in your browser and try again, or select your location manually below.');
             break;
           case error.POSITION_UNAVAILABLE:
-            setLocationError('Location information unavailable. Please select manually.');
+            setLocationError('❌ Location information unavailable. Please check your internet connection or select your location manually below.');
             break;
           case error.TIMEOUT:
-            setLocationError('Location request timed out. Please try again or select manually.');
+            setLocationError('⏱️ Location request timed out. Please try again with a stronger GPS signal or select your location manually below.');
             break;
           default:
-            setLocationError('An unknown error occurred. Please select location manually.');
+            setLocationError('❌ Location detection failed. Please select your location manually using the dropdowns below.');
             break;
         }
       },
@@ -348,8 +379,26 @@ function App() {
             </button>
           </div>
           {locationError && (
-            <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg shadow-sm">
-              <p className="text-red-700 text-sm">{locationError}</p>
+            <div className={`mt-3 p-3 rounded-lg shadow-sm ${
+              locationError.includes('✅') || locationError.includes('Great accuracy') 
+                ? 'bg-green-50 border border-green-200' 
+                : locationError.includes('📍') || locationError.includes('This looks good')
+                ? 'bg-blue-50 border border-blue-200'
+                : locationError.includes('🔍')
+                ? 'bg-yellow-50 border border-yellow-200'
+                : 'bg-red-50 border border-red-200'
+            }`}>
+              <p className={`text-sm ${
+                locationError.includes('✅') || locationError.includes('Great accuracy')
+                  ? 'text-green-700'
+                  : locationError.includes('📍') || locationError.includes('This looks good')
+                  ? 'text-blue-700'
+                  : locationError.includes('🔍')
+                  ? 'text-yellow-700'
+                  : 'text-red-700'
+              }`}>
+                {locationError}
+              </p>
             </div>
           )}
         </div>
