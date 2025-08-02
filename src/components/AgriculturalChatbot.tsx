@@ -52,8 +52,13 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
   // Enhanced location finder with fuzzy matching
   const findLocationByName = (locationText: string): ClimateData | null => {
     const searchTerm = locationText.toLowerCase().trim();
-    // Remove common words like "ward", "county", "subcounty" from search
-    const cleanedTerm = searchTerm.replace(/\b(ward|county|subcounty)\b/g, '').trim();
+    
+    // More comprehensive cleaning - remove all common words and focus on location name
+    let cleanedTerm = searchTerm
+      .replace(/\b(what|crops?|livestock|pasture|fodder|suitable|for|in|are|is|can|i|grow|keep|my|area|ward|county|subcounty|show|me|the)\b/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+    
     const words = cleanedTerm.split(/[\s,.-]+/).filter(word => word.length > 2);
     
     console.log('Searching for location:', searchTerm, 'cleaned:', cleanedTerm, 'words:', words);
