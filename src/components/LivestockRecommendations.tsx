@@ -99,11 +99,13 @@ export const LivestockRecommendations: React.FC<LivestockRecommendationsProps> =
                           {/* Details Button */}
                           <button
                             onClick={() => toggleDetails(breedKey)}
-                            className="ml-4 flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                            className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 transition-all duration-200"
                           >
                             <Info className="w-4 h-4" />
-                            {showDetailCard ? 'Hide Details' : 'Show Details'}
                           </button>
+                        </div>
+                        <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
+                          <Cow className="w-4 h-4 text-white" />
                         </div>
                         
                         {/* Detailed Card - Only show when details button is clicked */}
@@ -117,8 +119,7 @@ export const LivestockRecommendations: React.FC<LivestockRecommendationsProps> =
                   })}
                 </div>
               )}
-              </div>
-              
+            </div>
           ))}
         </div>
       </div>
