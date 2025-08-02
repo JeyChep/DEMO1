@@ -308,14 +308,7 @@ function App() {
             </div>
             
             <div className="flex items-center gap-4">
-              <button
-                onClick={handleAutoDetectLocation}
-                disabled={isDetectingLocation}
-                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all duration-200 shadow-md"
-              >
-                <Navigation className={`w-4 h-4 ${isDetectingLocation ? 'animate-spin' : ''}`} />
-                {isDetectingLocation ? 'Detecting...' : 'Auto-Detect Location'}
-              </button>
+              {/* Auto-detect button removed - only keeping the one in hero section */}
             </div>
             
           </div>
