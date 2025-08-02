@@ -99,7 +99,7 @@ export const PastureRecommendations: React.FC<PastureRecommendationsProps> = ({ 
                           {/* Details Button */}
                           <button
                             onClick={() => toggleDetails(varietyKey)}
-                            className="ml-4 flex items-center gap-2 px-3 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors text-sm"
+                            className="ml-4 flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
                           >
                             <Info className="w-4 h-4" />
                             {showDetailCard ? 'Hide Details' : 'Show Details'}

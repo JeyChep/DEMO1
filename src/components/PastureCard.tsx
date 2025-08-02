@@ -14,8 +14,8 @@ export const PastureCard: React.FC<PastureCardProps> = ({ recommendation }) => {
       <div className="p-6">
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center">
-              <Wheat className="w-6 h-6 text-amber-600" />
+            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+              <Wheat className="w-6 h-6 text-green-600" />
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-900">{pasture.Variety}</h3>
