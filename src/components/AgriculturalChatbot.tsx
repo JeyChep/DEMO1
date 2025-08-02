@@ -32,7 +32,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: "🌾 Hello! I'm your KALRO Agricultural Assistant. I can help you find the best crops, livestock, and pasture for any ward in Kenya.\n\n💬 Ask me naturally - I understand farmer language:\n• \"What can I grow in Kandara?\"\n• \"Show me maize varieties for my area\"\n• \"Which cows are good for Meru?\"\n• \"I want to plant tomatoes in Nakuru\"\n• \"What grass is good for my animals?\"\n• \"Coffee farming in Kiambu\"\n• \"Beans for Machakos ward\"",
+      text: "🌾 Hello! I'm Selector Bot - your crop selection helper! I help farmers find the best crops, livestock, and pasture for any ward in Kenya.\n\n💬 Talk to me like a friend - I understand farmer language:\n• \"What can I grow in Kandara?\"\n• \"Show me maize varieties for my area\"\n• \"Which cows are good for Meru?\"\n• \"I want to plant tomatoes in Nakuru\"\n• \"What grass is good for my animals?\"\n• \"Coffee farming in Kiambu\"\n• \"Beans for Machakos ward\"\n\n🎯 I'm here to help you select the right crops for your farm!",
       isUser: false,
       timestamp: new Date()
     }
@@ -461,8 +461,8 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
             <Bot className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="font-semibold">KALRO Assistant</h3>
-            <p className="text-xs text-green-100">Agricultural Guidance</p>
+            <h3 className="font-semibold">Selector Bot</h3>
+            <p className="text-xs text-green-100">Find Your Perfect Crops</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -517,7 +517,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
                       <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
                       <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                     </div>
-                    <span className="text-sm text-gray-600">KALRO Assistant is thinking...</span>
+                    <span className="text-sm text-gray-600">Selector Bot is thinking...</span>
                   </div>
                 </div>
               </div>
@@ -533,7 +533,7 @@ export const AgriculturalChatbot: React.FC<AgriculturalChatbotProps> = ({
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Ask about crops for your ward..."
+                placeholder="Ask me: What crops for my ward?"
                 className="flex-1 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
                 disabled={isTyping}
               />
