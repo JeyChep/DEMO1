@@ -30,8 +30,6 @@ function App() {
   const [pastureRecommendations, setPastureRecommendations] = useState<PastureRecommendation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState(0);
-  const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
-  const [locationError, setLocationError] = useState<string>('');
   const [dataError, setDataError] = useState<string>('');
   const [showLocationMap, setShowLocationMap] = useState<boolean>(false);
   const [showEconomics, setShowEconomics] = useState<boolean>(false);
@@ -203,116 +201,6 @@ function App() {
     }
   }, [selectedLocation, pastureData, aezData]);
 
-  const handleLocationDetection = () => {
-    setLocationError('');
-    
-    if (!navigator.geolocation) {
-      setLocationError('Geolocation is not supported by this browser.');
-      return;
-    }
-
-    const options = {
-      enableHighAccuracy: true,
-      timeout: 30000, // Increased timeout for better accuracy
-      maximumAge: 60000 // 1 minute - fresher location data
-    };
-
-    setLocationError('🔍 Detecting your location... This may take a moment for better accuracy.');
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-        const accuracy = position.coords.accuracy;
-        setUserLocation({ lat: latitude, lon: longitude });
-        
-        if (climateData.length === 0) {
-          setLocationError('Climate data not loaded yet. Please try again.');
-          return;
-        }
-        
-        // Find closest ward with improved algorithm
-        let closest = climateData[0];
-        let minDistance = calculateDistance(latitude, longitude, closest.lat, closest.lon);
-        let alternativeOptions: { ward: ClimateData; distance: number }[] = [];
-        
-        climateData.forEach(ward => {
-          const distance = calculateDistance(latitude, longitude, ward.lat, ward.lon);
-          if (distance < minDistance) {
-            // Keep track of previous closest as alternative
-            if (minDistance < 50) { // Only if reasonably close
-              alternativeOptions.push({ ward: closest, distance: minDistance });
-            }
-            minDistance = distance;
-            closest = ward;
-          } else if (distance < 50 && alternativeOptions.length < 3) {
-            // Keep track of other nearby options
-            alternativeOptions.push({ ward, distance });
-          }
-        });
-        
-        // Sort alternatives by distance
-        alternativeOptions.sort((a, b) => a.distance - b.distance);
-        
-        console.log(`GPS Accuracy: ${accuracy}m`);
-        console.log(`Found closest location: ${closest.ward}, ${closest.subcounty}, ${closest.county} (${minDistance.toFixed(2)}km away)`);
-        console.log('Alternative nearby locations:', alternativeOptions.slice(0, 3));
-        
-        setSelectedLocation(closest);
-        
-        // Auto-fill the location selector dropdowns
-        setSelectedCounty(closest.county);
-        setSelectedSubcounty(closest.subcounty);
-        
-        // Provide feedback about detection accuracy
-        if (minDistance > 20) {
-          setLocationError(`📍 Location detected: ${closest.ward}, ${closest.subcounty}, ${closest.county} (${minDistance.toFixed(1)}km away). If this seems incorrect, please select manually below.`);
-        } else if (minDistance > 10) {
-          setLocationError(`📍 Location detected: ${closest.ward}, ${closest.subcounty}, ${closest.county} (${minDistance.toFixed(1)}km away). This looks good!`);
-        } else {
-          setLocationError(`✅ Location detected: ${closest.ward}, ${closest.subcounty}, ${closest.county}. Great accuracy!`);
-        }
-        
-        // Show alternatives if main detection might be off
-        if (minDistance > 15 && alternativeOptions.length > 0) {
-          const altText = alternativeOptions.slice(0, 2).map(alt => 
-            `${alt.ward.ward} (${alt.distance.toFixed(1)}km)`
-          ).join(', ');
-          setLocationError(prev => prev + ` Nearby alternatives: ${altText}`);
-        }
-      },
-      (error) => {
-        console.error('Geolocation error:', error);
-        switch(error.code) {
-          case error.PERMISSION_DENIED:
-            setLocationError('❌ Location access denied. Please enable location permissions in your browser and try again, or select your location manually below.');
-            break;
-          case error.POSITION_UNAVAILABLE:
-            setLocationError('❌ Location information unavailable. Please check your internet connection or select your location manually below.');
-            break;
-          case error.TIMEOUT:
-            setLocationError('⏱️ Location request timed out. Please try again with a stronger GPS signal or select your location manually below.');
-            break;
-          default:
-            setLocationError('❌ Location detection failed. Please select your location manually using the dropdowns below.');
-            break;
-        }
-      },
-      options
-    );
-  };
-
-  // Haversine formula to calculate distance between two points
-  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
-    const R = 6371; // Radius of the Earth in kilometers
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = 
-      Math.sin(dLat/2) * Math.sin(dLat/2) +
-      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-      Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return R * c;
-  };
-
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center">
@@ -370,37 +258,7 @@ function App() {
               </div>
             </div>
             
-            <button
-              onClick={handleLocationDetection}
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-md"
-            >
-              <Navigation className="w-4 h-4" />
-              Detect Location
-            </button>
           </div>
-          {locationError && (
-            <div className={`mt-3 p-3 rounded-lg shadow-sm ${
-              locationError.includes('✅') || locationError.includes('Great accuracy') 
-                ? 'bg-green-50 border border-green-200' 
-                : locationError.includes('📍') || locationError.includes('This looks good')
-                ? 'bg-blue-50 border border-blue-200'
-                : locationError.includes('🔍')
-                ? 'bg-yellow-50 border border-yellow-200'
-                : 'bg-red-50 border border-red-200'
-            }`}>
-              <p className={`text-sm ${
-                locationError.includes('✅') || locationError.includes('Great accuracy')
-                  ? 'text-green-700'
-                  : locationError.includes('📍') || locationError.includes('This looks good')
-                  ? 'text-blue-700'
-                  : locationError.includes('🔍')
-                  ? 'text-yellow-700'
-                  : 'text-red-700'
-              }`}>
-                {locationError}
-              </p>
-            </div>
-          )}
         </div>
       </header>
 
@@ -422,14 +280,7 @@ function App() {
               Get science-based recommendations for crops, livestock, and pasture based on Kenya's agro-ecological zones
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button
-                onClick={handleLocationDetection}
-                className="flex items-center justify-center gap-2 px-6 py-3 bg-white text-green-700 rounded-lg hover:bg-green-50 transition-colors duration-200 font-semibold shadow-lg"
-              >
-                <Navigation className="w-5 h-5" />
-                Auto-Detect My Location
-              </button>
-              <div className="text-green-100 self-center">or select manually below</div>
+              <div className="text-green-100 text-lg">Select your location below to get personalized recommendations</div>
             </div>
           </div>
         </div>
