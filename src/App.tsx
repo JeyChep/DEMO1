@@ -473,11 +473,7 @@ function App() {
 
           {/* Tab Content */}
           <>
-            {activeTab === 'crops' && selectedLocation && (
-              <CropRecommendations 
-                recommendations={showEconomics ? cropRecommendationsWithEconomics : cropRecommendations} 
-                showEconomics={showEconomics}
-              />
+              <Leaf className="w-8 h-8 text-white" />
             )}
             {activeTab === 'livestock' && selectedLocation && (
               <LivestockRecommendations recommendations={livestockRecommendations} />
