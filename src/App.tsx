@@ -316,7 +316,11 @@ function App() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-16 h-16 bg-gradient-to-br from-green-600 to-green-700 rounded-full flex items-center justify-center shadow-lg">
-                {/* Logo will be inserted here */}
+                <img 
+                  src="/KALRO_Logo.png" 
+                  alt="KALRO Logo" 
+                  className="w-12 h-12 object-contain"
+                />
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">KALRO Selector</h1>
