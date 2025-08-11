@@ -468,19 +468,21 @@ function App() {
           )}
 
           {/* Tab Content */}
-          <>
-              <Leaf className="w-8 h-8 text-white" />
-            )}
-            {activeTab === 'livestock' && selectedLocation && (
+          {activeTab === 'crops' && selectedLocation && (
+            <CropRecommendations 
+              recommendations={showEconomics ? cropRecommendationsWithEconomics : cropRecommendations}
+              showEconomics={showEconomics}
+            />
+          )}
+          {activeTab === 'livestock' && selectedLocation && (
               <LivestockRecommendations recommendations={livestockRecommendations} />
-            )}
-            {activeTab === 'pasture' && selectedLocation && (
+          )}
+          {activeTab === 'pasture' && selectedLocation && (
               <PastureRecommendations recommendations={pastureRecommendations} />
-            )}
-            {activeTab === 'suitability-map' && (
+          )}
+          {activeTab === 'suitability-map' && (
               <FarmerSuitabilityMap cropsData={cropsData} climateData={climateData} />
-            )}
-          </>
+          )}
         </div>
       </main>
 
